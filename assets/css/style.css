@@ -1,3 +1,11 @@
+/**
+ * ============================================
+ * RUTA: assets/css/style.css
+ * ============================================
+ * Mitla Tours - Estilos Principales
+ * Incluye: Carrusel, Animaciones, Hover Effects
+ */
+
 * {
     margin: 0;
     padding: 0;
@@ -10,12 +18,30 @@ body {
     color: #333;
 }
 
-/* NAVBAR  */
+/* ====== NAVBAR ====== */
 .navbar {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* HERO CAROUSEL SECTION  */
+.navbar-logo {
+    height: 40px;
+    max-width: 200px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.05);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+/* ====== HERO CAROUSEL SECTION ====== */
 .hero-carousel-section {
     position: relative;
     height: 600px;
@@ -44,7 +70,7 @@ body {
     opacity: 1;
 }
 
-/* Overlay configurable */
+/* Overlay configurable - PUEDES MODIFICAR LA TRANSPARENCIA AQUÍ */
 .hero-overlay {
     position: absolute;
     top: 0;
@@ -52,7 +78,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    /* ajustar transparencia del 0 al 1 */
+    /* Cambia 0.5 para ajustar transparencia (0 = transparente, 1 = opaco) */
     z-index: 1;
 }
 
@@ -117,33 +143,78 @@ body {
     border-radius: 6px;
 }
 
-/* FEATURES SECTION  */
+/* ====== FEATURES SECTION ====== */
 .features {
     background-color: #fff;
 }
 
+/* 
+ * CONTENEDOR DE CADA CARACTERÍSTICA
+ * Equivale al área de 19.998cm x 19.05cm en PowerPoint
+ * Ajusta min-height si necesitas más/menos espacio vertical
+ */
 .feature-box {
     position: relative;
-    padding: 30px 20px;
-    transition: all 0.4s ease;
+    padding: 20px;
     cursor: pointer;
-    min-height: 250px;
+    min-height: 320px;
+    /* AJUSTABLE: Altura mínima del contenedor */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    overflow: hidden;
 }
 
+.feature-box:hover {
+    background-color: #ffffff;
+    /* AJUSTABLE: Color de fondo al hover */
+}
+
+/* 
+ * WRAPPER DEL ÍCONO
+ * Estado inicial: Centrado horizontalmente, parte superior-centro
+ * Tamaño inicial: 8.34cm ancho x 6.62cm alto (en PowerPoint)
+ */
 .feature-icon-wrapper {
-    position: relative;
-    margin-bottom: 20px;
-    transition: all 0.4s ease;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* ESTADO INICIAL - Posición centrada */
+    top: 50px;
+    /* AJUSTABLE: Posición vertical inicial (de centro ~6cm = ~60px aprox) */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Centrado horizontal */
+
+    /* Tamaño inicial del wrapper */
+    width: 100px;
+    /* AJUSTABLE: 8.34cm en PowerPoint ≈ 100px */
+    height: 80px;
+    /* AJUSTABLE: 6.62cm en PowerPoint ≈ 80px */
+
+    /* Duración de la animación */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* AJUSTABLE: Cambia 0.5s para más rápido/lento */
 }
 
+/* 
+ * ÍCONO (Font Awesome)
+ * Se escala al 100% inicialmente
+ */
 .feature-icon {
-    transition: all 0.4s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* AJUSTABLE: Duración de transición */
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
+/* Imágenes adicionales (clima, ticket) - ocultas por defecto */
 .feature-image {
     display: none;
     max-width: 60px;
@@ -153,39 +224,150 @@ body {
     transform: translate(-50%, -50%);
 }
 
+/* 
+ * TÍTULO
+ * Estado inicial: Debajo del ícono, centrado
+ * Posición inicial PowerPoint: horizontal 3.97cm, vertical 10.15cm
+ * Tamaño: 12.05cm ancho x 1.97cm alto
+ */
 .feature-title {
-    font-size: 1.2rem;
+    position: absolute;
+    font-size: 1.1rem;
+    /* AJUSTABLE: Tamaño de fuente */
     font-weight: 600;
-    margin-bottom: 15px;
-    transition: all 0.4s ease;
-}
-
-.feature-description {
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    font-size: 0.9rem;
-    color: #666;
     text-align: center;
+    line-height: 1.3;
+
+    /* ESTADO INICIAL - Centrado debajo del ícono */
+    top: 140px;
+    /* AJUSTABLE: 10.15cm en PowerPoint ≈ 140px */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    /* AJUSTABLE: 12.05cm de los 20cm totales ≈ 60% */
+    max-width: 250px;
+    /* AJUSTABLE: Ancho máximo del título */
+
+    /* Duración de animación */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* AJUSTABLE: Velocidad de transición */
 }
 
-/* Efecto hover individual */
+/* 
+ * DESCRIPCIÓN
+ * Aparece debajo del ícono y título cuando están en su posición final
+ */
+.feature-description {
+    position: absolute;
+    opacity: 0;
+    font-size: 0.85rem;
+    /* AJUSTABLE: Tamaño de fuente de descripción */
+    color: #666;
+    /* AJUSTABLE: Color del texto */
+    text-align: left;
+    line-height: 1.6;
+    padding: 0 15px;
+
+    /* Posición inicial (oculta debajo) */
+    top: 200px;
+    /* AJUSTABLE: Dónde aparece la descripción */
+    left: 10px;
+    right: 10px;
+
+    /* Animación de aparición */
+    transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+    /* AJUSTABLE: 0.2s es el delay */
+    transform: translateY(20px);
+    /* AJUSTABLE: Desde cuánto abajo aparece */
+}
+
+/* 
+ * ============================================
+ * ESTADO HOVER - Posiciones finales
+ * ============================================
+ */
+
+/* 
+ * ÍCONO al hacer HOVER
+ * Posición final PowerPoint: horizontal 0.56cm, vertical 1.13cm
+ * Tamaño final: 6.95cm ancho x 5.52cm alto
+ */
 .feature-box:hover .feature-icon-wrapper {
-    transform: translateY(-15px) scale(0.8);
+    /* Posición final - Esquina superior izquierda */
+    top: 15px;
+    /* AJUSTABLE: 1.13cm en PowerPoint ≈ 15px desde arriba */
+    left: 25px;
+    /* AJUSTABLE: 0.56cm en PowerPoint ≈ 25px desde izquierda */
+    transform: translateX(0) scale(0.83);
+    /* AJUSTABLE: 0.83 = reducción del ícono (6.95/8.34) */
 }
 
+/* 
+ * TÍTULO al hacer HOVER
+ * Posición final PowerPoint: horizontal 6.62cm, vertical 3.17cm
+ * Se coloca a la derecha del ícono
+ */
 .feature-box:hover .feature-title {
-    transform: translateY(-10px);
-    font-size: 1rem;
+    top: 25px;
+    /* AJUSTABLE: 3.17cm en PowerPoint ≈ 25-30px */
+    left: 110px;
+    /* AJUSTABLE: 6.62cm en PowerPoint ≈ 110px desde izquierda */
+    transform: translateX(0);
+    text-align: left;
+    font-size: 0.95rem;
+    /* AJUSTABLE: Se reduce ligeramente */
+    width: auto;
+    max-width: 200px;
+    /* AJUSTABLE: Ancho máximo en estado hover */
 }
 
+/* 
+ * DESCRIPCIÓN al hacer HOVER
+ * Aparece con opacidad completa
+ */
 .feature-box:hover .feature-description {
     opacity: 1;
-    max-height: 200px;
+    transform: translateY(0);
+    /* Se mueve a su posición final */
+    top: 90px;
+    /* AJUSTABLE: Altura donde aparece la descripción debajo del título */
 }
 
-/* PACKAGES SECTION  */
+/* 
+ * ============================================
+ * AJUSTES RESPONSIVOS
+ * ============================================
+ */
+@media (max-width: 768px) {
+    .feature-box {
+        min-height: 250px;
+        /* AJUSTABLE: Altura en móviles */
+    }
+
+    .feature-icon-wrapper {
+        width: 80px;
+        /* AJUSTABLE: Tamaño ícono en móvil */
+        height: 65px;
+    }
+
+    .feature-title {
+        font-size: 1rem;
+        top: 120px;
+    }
+
+    .feature-box:hover .feature-title {
+        font-size: 0.9rem;
+        left: 90px;
+        max-width: 150px;
+    }
+
+    .feature-box:hover .feature-description {
+        top: 80px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ====== PACKAGES SECTION ====== */
 .packages {
     background-color: #f8f9fa;
 }
@@ -213,7 +395,7 @@ body {
     z-index: 0;
 }
 
-/* Overlay configurable para paquetes */
+/* Overlay configurable para paquetes - PUEDES MODIFICAR LA TRANSPARENCIA AQUÍ */
 .package-overlay {
     position: absolute;
     top: 0;
@@ -221,7 +403,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
-    /* ajustar transparencia */
+    /* Cambia 0.6 para ajustar transparencia */
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 1;
@@ -272,7 +454,7 @@ body {
     color: white;
 }
 
-/* INFO SECTION (Wikipedia) */
+/* ====== INFO SECTION (Wikipedia) ====== */
 .info-section {
     position: relative;
     min-height: 400px;
@@ -290,7 +472,7 @@ body {
     z-index: 0;
 }
 
-/* Overlay configurable para info*/
+/* Overlay configurable para info - PUEDES MODIFICAR LA TRANSPARENCIA AQUÍ */
 .info-overlay {
     position: absolute;
     top: 0;
@@ -298,7 +480,7 @@ body {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
-    /* ajustar transparencia */
+    /* Cambia 0.8 para ajustar transparencia */
     z-index: 1;
 }
 
@@ -349,12 +531,12 @@ body {
     transform: translate(-50%, -50%) scale(1) rotate(0deg);
 }
 
-/*  FOOTER */
+/* ====== FOOTER ====== */
 footer {
     margin-top: 50px;
 }
 
-/* RESPONSIVE  */
+/* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
     .hero-carousel-section {
         height: 400px;
@@ -373,7 +555,7 @@ footer {
     }
 }
 
-/* BOTONES  */
+/* ====== BOTONES ====== */
 .btn-primary {
     background-color: #0066cc;
     border-color: #0066cc;
