@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "packages": "Forfaits",
+    "my_bookings": "Mes Réservations"
+  },
+  "home": {
+    "title": "Bienvenue à Mitla Tours",
+    "hero_title": "Découvrez les Grottes Préhistoriques de Mitla",
+    "hero_subtitle": "Vivez une expérience unique avec des guides certifiés",
+    "book_now": "Réserver",
+    "featured_packages": "Forfaits en Vedette"
+  },
+  "packages": {
+    "duration": "Durée",
+    "hours": "heures",
+    "capacity": "Capacité",
+    "people": "personnes",
+    "price_guide": "Prix guide",
+    "price_entry": "Entrée",
+    "book": "Réserver"
+  },
+  "footer": {
+    "rights": "Tous droits réservés"
+  }
+}

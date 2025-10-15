@@ -1,0 +1,27 @@
+{
+    "nav": {
+        "home": "Inicio",
+        "packages": "Paquetes",
+        "my_bookings": "Mis Reservas"
+    },
+    "home": {
+        "title": "Bienvenidos a Mitla Tours",
+        "hero_title": "Descubre las Cuevas Prehistóricas de Mitla",
+        "hero_subtitle": "Vive una experiencia única con guías certificados",
+        "book_now": "Reservar Ahora",
+        "featured_packages": "Paquetes Destacados",
+        "view_all": "Ver Todos los Paquetes"
+    },
+    "packages": {
+        "duration": "Duración",
+        "hours": "horas",
+        "capacity": "Capacidad máxima",
+        "people": "personas",
+        "price_guide": "Precio guía",
+        "price_entry": "Entrada por persona",
+        "book": "Reservar"
+    },
+    "footer": {
+        "rights": "Todos los derechos reservados"
+    }
+}

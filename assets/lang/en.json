@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "home": "Home",
+    "packages": "Packages",
+    "my_bookings": "My Bookings"
+  },
+  "home": {
+    "title": "Welcome to Mitla Tours",
+    "hero_title": "Discover the Prehistoric Caves of Mitla",
+    "hero_subtitle": "Live a unique experience with certified guides",
+    "book_now": "Book Now",
+    "featured_packages": "Featured Packages"
+  },
+  "packages": {
+    "duration": "Duration",
+    "hours": "hours",
+    "capacity": "Capacity",
+    "people": "people",
+    "price_guide": "Guide price",
+    "price_entry": "Entry",
+    "book": "Book"
+  },
+  "footer": {
+    "rights": "All rights reserved"
+  }
+}
