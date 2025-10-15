@@ -1,4 +1,7 @@
 {
+    "_comment": "============================================",
+    "_ruta": "assets/lang/es.json",
+    "_descripcion": "Traducciones en Español",
     "nav": {
         "home": "Inicio",
         "packages": "Paquetes",
@@ -10,7 +13,24 @@
         "hero_subtitle": "Vive una experiencia única con guías certificados",
         "book_now": "Reservar Ahora",
         "featured_packages": "Paquetes Destacados",
-        "view_all": "Ver Todos los Paquetes"
+        "view_all_packages": "Todos los paquetes",
+        "feature1_title": "Paseos seguros",
+        "feature1_desc": "Con guías locales capacitados",
+        "feature2_title": "Guías en diferentes idiomas",
+        "feature2_desc": "Senderos señalizados, áreas de descanso, barandales en puntos estratégicos, señalética bilingüe (español-inglés), Centro Interpretativo con sala de exposición y audiovisuales",
+        "feature3_title": "Consulta el clima el día de tu guía",
+        "feature3_desc": "Planifica tu recorrido para el clima que más te gusta al momento de reservar",
+        "feature4_title": "Tu ticket en tu teléfono",
+        "feature4_desc": "Cuando reserves tu recorrido se genera un ticket con toda la información",
+        "location_title": "Ubicación",
+        "location_desc": "San Pablo Villa de Mitla está ubicado en el estado de Oaxaca, México.",
+        "location_mitla": "A 44 km de Oaxaca de Juárez (aprox. 50 min)",
+        "location_oaxaca": "En el distrito de Tlacolula, región Valles Centrales",
+        "info_title": "Información Importante",
+        "info_desc": "Recomendaciones para tu visita:",
+        "info_comfortable_shoes": "Calzado cómodo para caminata",
+        "info_water": "Agua personal en botella reutilizable",
+        "info_sunscreen": "Bloqueador solar biodegradable"
     },
     "packages": {
         "duration": "Duración",
@@ -22,6 +42,10 @@
         "book": "Reservar"
     },
     "footer": {
-        "rights": "Todos los derechos reservados"
+        "rights": "Todos los derechos reservados",
+        "admin_access": "Acceso Administrador"
+    },
+    "meta": {
+        "description": "Descubre las cuevas prehistóricas de Mitla con guías certificados. Reserva tu experiencia única en los Valles Centrales de Oaxaca."
     }
 }
