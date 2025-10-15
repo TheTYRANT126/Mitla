@@ -41,6 +41,11 @@ body {
     font-weight: 600;
 }
 
+.navbar-nav .nav-item {
+    margin-left: 15px;
+    /* AJUSTABLE: Espacio entre elementos del menú */
+}
+
 /* ====== HERO CAROUSEL SECTION ====== */
 .hero-carousel-section {
     position: relative;
@@ -157,8 +162,8 @@ body {
     position: relative;
     padding: 20px;
     cursor: pointer;
-    min-height: 320px;
-    /* AJUSTABLE: Altura mínima del contenedor */
+    min-height: 210px;
+    /* 250 AJUSTABLE: Altura mínima del contenedor */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -214,14 +219,133 @@ body {
     height: 100%;
 }
 
-/* Imágenes adicionales (clima, ticket) - ocultas por defecto */
-.feature-image {
-    display: none;
-    max-width: 60px;
+/* Colores individuales para los íconos de características */
+.feature-icon-safe {
+    color: #04aade;
+}
+
+/* AJUSTABLE: Verde para seguridad */
+.feature-icon-lang {
+    color: #9dc639;
+}
+
+/* AJUSTABLE: Naranja para idiomas */
+.feature-icon-weather {
+    color: #e65eb0;
+}
+
+/* AJUSTABLE: Cian para clima */
+.feature-icon-phone {
+    color: #3f9f3a;
+}
+
+/* AJUSTABLE: Púrpura para teléfono */
+
+
+/* 
+ * ============================================
+ * ESTILOS ESPECIALES PARA CLIMA Y TELÉFONO
+ * ============================================
+ */
+
+/* 
+ * IMAGEN DEL CLIMA dentro de la descripción
+ * Aparece arriba del texto cuando se hace hover
+ */
+.clima-preview-image {
+    display: block;
+    width: 100%;
+    /* AJUSTABLE: Ancho de la imagen del clima */
+    max-width: 200px;
+    /* AJUSTABLE: Ancho máximo */
+    margin: 0 auto 15px auto;
+    /* AJUSTABLE: Espacio debajo de la imagen */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+    /* AJUSTABLE: Velocidad */
+}
+
+.feature-box:hover .clima-preview-image {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 
+ * CONTENEDOR DEL TELÉFONO
+ * Permite que el texto aparezca dentro de la imagen del teléfono
+ */
+.feature-phone-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 250px;
+    /* AJUSTABLE: Ancho máximo del contenedor */
+    margin: 0 auto;
+}
+
+/* 
+ * IMAGEN DEL TELÉFONO
+ * Sirve como fondo/contenedor
+ */
+.phone-image {
+    width: 110%;
+    /* AJUSTABLE: Tamaño del teléfono */
+    max-width: 240px;
+    /* AJUSTABLE: Ancho máximo del teléfono */
+    height: auto;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.3s, transform 0.5s ease;
+    transform: translate(10px, -28px);
+    /* AJUSTABLE: Mueve la imagen (X, Y). X=lados, Y=arriba/abajo */
+    /* AJUSTABLE: Velocidad de aparición */
+}
+
+.feature-box:hover .phone-image {
+    opacity: 1;
+}
+
+/* 
+ * TEXTO DENTRO DEL TELÉFONO
+ * Posicionado absolutamente sobre la imagen
+ */
+.phone-text {
     position: absolute;
-    top: 50%;
+    top: 35%;
+    /* AJUSTABLE: Posición vertical del texto (35% desde arriba) */
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 65%;
+    /* AJUSTABLE: Ancho del texto dentro del teléfono */
+    padding: 10px;
+    /* AJUSTABLE: Espaciado interno */
+    font-size: 0.75rem;
+    /* AJUSTABLE: Tamaño de fuente */
+    color: #333;
+    /* AJUSTABLE: Color del texto */
+    text-align: center;
+    line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.5s;
+    /* AJUSTABLE: Aparece después del teléfono */
+}
+
+.feature-box:hover .phone-text {
+    opacity: 1;
+}
+
+/* Ajuste especial para la caja del teléfono */
+.feature-box-phone .feature-description {
+    top: 90px;
+    /* AJUSTABLE: Posición del contenedor del teléfono */
+}
+
+.feature-box-phone:hover .feature-description {
+    top: 90px;
+    /* AJUSTABLE: Se mantiene en la misma posición */
 }
 
 /* 
@@ -296,8 +420,8 @@ body {
     /* Posición final - Esquina superior izquierda */
     top: 15px;
     /* AJUSTABLE: 1.13cm en PowerPoint ≈ 15px desde arriba */
-    left: 25px;
-    /* AJUSTABLE: 0.56cm en PowerPoint ≈ 25px desde izquierda */
+    left: 1px;
+    /* 25 AJUSTABLE: 0.56cm en PowerPoint ≈ 25px desde izquierda */
     transform: translateX(0) scale(0.83);
     /* AJUSTABLE: 0.83 = reducción del ícono (6.95/8.34) */
 }
@@ -309,9 +433,9 @@ body {
  */
 .feature-box:hover .feature-title {
     top: 25px;
-    /* AJUSTABLE: 3.17cm en PowerPoint ≈ 25-30px */
-    left: 110px;
-    /* AJUSTABLE: 6.62cm en PowerPoint ≈ 110px desde izquierda */
+    /* 25 AJUSTABLE: 3.17cm en PowerPoint ≈ 25-30px */
+    left: 90px;
+    /* 110 AJUSTABLE: 6.62cm en PowerPoint ≈ 110px desde izquierda */
     transform: translateX(0);
     text-align: left;
     font-size: 0.95rem;
@@ -454,6 +578,22 @@ body {
     color: white;
 }
 
+/* Texto debajo del botón "Todos los paquetes" */
+.packages-subtext {
+    font-size: 1.0rem;
+    /* AJUSTABLE: Tamaño de la fuente */
+    font-weight: 700;
+    /* AJUSTABLE: Grosor de la fuente (700 es negrita) */
+    color: #000000;
+    /* AJUSTABLE: Color del texto (amarillo) */
+    max-width: 800px;
+    /* Opcional: Limita el ancho en pantallas grandes */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    /* AJUSTABLE: Espacio entre el botón y este texto */
+}
+
 /* ====== INFO SECTION (Wikipedia) ====== */
 .info-section {
     position: relative;
@@ -496,8 +636,10 @@ body {
 
 .wiki-icon-wrapper {
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    /* AJUSTABLE: Ancho del contenedor del ícono */
+    height: 140px;
+    /* AJUSTABLE: Alto del contenedor del ícono */
     margin: 0 auto;
 }
 
@@ -508,6 +650,8 @@ body {
     transform: translate(-50%, -50%);
     opacity: 1;
     transition: all 0.6s ease;
+    font-size: 90px;
+    /* AJUSTABLE: Tamaño del ícono de información (i) */
 }
 
 .wikipedia-icon {
@@ -516,7 +660,8 @@ body {
     left: 50%;
     transform: translate(-50%, -50%) scale(0) rotate(-180deg);
     opacity: 0;
-    width: 100px;
+    width: 110px;
+    /* AJUSTABLE: Ancho del logo de Wikipedia */
     transition: all 0.6s ease;
 }
 
@@ -532,9 +677,7 @@ body {
 }
 
 /* ====== FOOTER ====== */
-footer {
-    margin-top: 50px;
-}
+
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {

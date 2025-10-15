@@ -30,7 +30,10 @@
         "info_desc": "Recomendaciones para tu visita:",
         "info_comfortable_shoes": "Calzado cómodo para caminata",
         "info_water": "Agua personal en botella reutilizable",
-        "info_sunscreen": "Bloqueador solar biodegradable"
+        "info_sunscreen": "Bloqueador solar biodegradable",
+        "packages_additional_info": "Visita guiada, interpretación cultural y natural, centro de visitantes con sanitarios, área de hidratación, módulos informativos y venta de artesanías locales.",
+        "info_section_title": "San Pablo Villa de Mitla es un pueblo y cabecera municipal en el estado de Oaxaca, México, famoso por ser el sitio de las ruinas arqueológicas de Mitla. Es parte del distrito de Tlacolula, en el este de la región de los Valles Centrales.",
+        "info_section_desc": "El pueblo es también conocido por sus textiles hechos a mano, sus piezas bordadas y por el mezcal. La ciudad también contiene un museo, el cual fue cerrado sin explicación alguna en 1995 y desde entonces toda su colección zapoteca y de elementos culturales mixtecas ha desaparecido. El nombre de \"San Pablo\" es en honor de San Pablo y \"Mitla\" es una castellanización del nombre náhuatl \"Mictlán.\" Este es el nombre que los aztecas dieron la antigua ciudad prehispánica antes de la llegada de los españoles y significa \"Tierra de los muertos\". Se encuentra en las regiones de los Valles Centrales de Oaxaca, a 46 km de la ciudad de Oaxaca, en el Distrito de Tlacolula."
     },
     "packages": {
         "duration": "Duración",

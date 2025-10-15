@@ -1,4 +1,11 @@
 <?php
+/**
+ * ============================================
+ * RUTA: index.php (raíz del proyecto)
+ * ============================================
+ * Página Principal - Mitla Tours
+ * Sistema de Reservaciones con Animaciones
+ */
 
 require_once __DIR__ . '/config/config.php';
 
@@ -31,7 +38,7 @@ $lang = getLanguage();
     <!-- Navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/index.php">
                 <?php 
                 $logoPath = ASSETS_PATH . '/img/logo.png';
                 if (file_exists($logoPath)): 
@@ -87,7 +94,7 @@ $lang = getLanguage();
             <div class="hero-slide" style="background-image: url('<?php echo ASSETS_URL; ?>/img/hero/hero-slide-3.jpg');"></div>
             <div class="hero-slide" style="background-image: url('<?php echo ASSETS_URL; ?>/img/hero/hero-slide-4.jpg');"></div>
             
-            <!-- Overlay con la transparencia configurable -->
+            <!-- Overlay con transparencia configurable -->
             <div class="hero-overlay"></div>
             
             <!-- Contenido -->
@@ -123,7 +130,7 @@ $lang = getLanguage();
                 <div class="col-md-3 mb-4">
                     <div class="feature-box">
                         <div class="feature-icon-wrapper">
-                            <i class="fas fa-user-shield fa-3x text-primary feature-icon"></i>
+                            <i class="fas fa-user-shield fa-3x feature-icon feature-icon-safe"></i>
                         </div>
                         <h4 class="feature-title">Paseos seguros</h4>
                         <p class="feature-description">Con guías locales capacitados</p>
@@ -134,7 +141,7 @@ $lang = getLanguage();
                 <div class="col-md-3 mb-4">
                     <div class="feature-box">
                         <div class="feature-icon-wrapper">
-                            <i class="fas fa-language fa-3x text-primary feature-icon"></i>
+                            <i class="fas fa-language fa-3x feature-icon feature-icon-lang"></i>
                         </div>
                         <h4 class="feature-title">Guías en diferentes idiomas</h4>
                         <p class="feature-description">Senderos señalizados, áreas de descanso, barandales en puntos estratégicos, señalética bilingüe (español-inglés), Centro Interpretativo con sala de exposición y audiovisuales</p>
@@ -145,23 +152,36 @@ $lang = getLanguage();
                 <div class="col-md-3 mb-4">
                     <div class="feature-box">
                         <div class="feature-icon-wrapper">
-                            <i class="fas fa-cloud-sun fa-3x text-primary feature-icon"></i>
-                            <img src="<?php echo ASSETS_URL; ?>/img/features/clima-icon.png" alt="Clima" class="feature-image">
+                            <i class="fas fa-cloud-sun fa-3x feature-icon feature-icon-weather"></i>
                         </div>
                         <h4 class="feature-title">Consulta el clima el día de tu guía</h4>
-                        <p class="feature-description">Planifica tu recorrido para el clima que más te gusta al momento de reservar</p>
+                        <p class="feature-description">
+                            <!-- Imagen del clima dentro de la descripción -->
+                            <img src="<?php echo ASSETS_URL; ?>/img/features/clima-icon.png" 
+                                 alt="Clima" 
+                                 class="clima-preview-image">
+                            Planifica tu recorrido para el clima que más te gusta al momento de reservar
+                        </p>
                     </div>
                 </div>
                 
                 <!-- Tu Ticket en tu Teléfono -->
                 <div class="col-md-3 mb-4">
-                    <div class="feature-box">
+                    <div class="feature-box feature-box-phone">
                         <div class="feature-icon-wrapper">
-                            <i class="fas fa-mobile-alt fa-3x text-primary feature-icon"></i>
-                            <img src="<?php echo ASSETS_URL; ?>/img/features/ticket-icon.png" alt="Ticket" class="feature-image">
+                            <i class="fas fa-mobile-alt fa-3x feature-icon feature-icon-phone"></i>
                         </div>
                         <h4 class="feature-title">Tu ticket en tu teléfono</h4>
-                        <p class="feature-description">Cuando reserves tu recorrido se genera un ticket con toda la información</p>
+                        <div class="feature-description feature-phone-container">
+                            <!-- Imagen del teléfono como fondo -->
+                            <img src="<?php echo ASSETS_URL; ?>/img/features/telefono.png" 
+                                 alt="Teléfono" 
+                                 class="phone-image">
+                            <!-- Texto dentro del teléfono -->
+                            <p class="phone-text">
+                                Cuando reserves tu recorrido se genera un ticket con toda la información
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -234,13 +254,16 @@ $lang = getLanguage();
             
             <div class="text-center mt-4">
                 <a href="/pages/paquetes.php" class="btn btn-outline-primary btn-lg">
-                    Todos los paquetes
+                    <?php echo t('home.view_all_packages'); ?>
                 </a>
+                <p class="packages-subtext">
+                    <?php echo t('home.packages_additional_info'); ?>
+                </p>
             </div>
         </div>
     </section>
     
-    <!-- Más Información con Wiki -->
+    <!-- Más Información con Wikipedia Icon -->
     <section class="info-section py-5">
         <div class="container">
             <!-- Imagen de fondo con overlay -->
@@ -251,11 +274,10 @@ $lang = getLanguage();
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h3 class="text-white mb-3">
-                            San Pablo Villa de Mitla es un pueblo y cabecera municipal en el estado de Oaxaca, México
+                            Más Información
                         </h3>
                         <p class="text-white">
-                            Famoso por ser el sitio de las ruinas arqueológicas de Mitla. Es parte del distrito de Tlacolula, 
-                            en el este de la región de los Valles Centrales.
+                            <?php echo t('home.info_section_title') . ' ' . t('home.info_section_desc'); ?>
                         </p>
                     </div>
                     <div class="col-md-4 text-center">
@@ -268,7 +290,7 @@ $lang = getLanguage();
                                      alt="Wikipedia" 
                                      class="wikipedia-icon">
                             </div>
-                            <p class="text-white mt-3">Más información</p>
+                            <p class="text-white mt-0">Más información</p>
                         </a>
                     </div>
                 </div>
