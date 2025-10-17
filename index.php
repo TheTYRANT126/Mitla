@@ -274,7 +274,7 @@ $lang = getLanguage();
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h3 class="text-white mb-3">
-                            Más Información
+                            Conoce más sobre Mitla
                         </h3>
                         <p class="text-white">
                             <?php echo t('home.info_section_title') . ' ' . t('home.info_section_desc'); ?>
