@@ -253,12 +253,15 @@ $lang = getLanguage();
             </div>
             
             <div class="text-center mt-4">
+                <!-- 
+                BOTÓN "TODOS LOS PAQUETES" COMENTADO PARA FUTURO USO
                 <a href="/pages/paquetes.php" class="btn btn-outline-primary btn-lg">
                     <?php echo t('home.view_all_packages'); ?>
                 </a>
-                <p class="packages-subtext">
-                    <?php echo t('home.packages_additional_info'); ?>
-                </p>
+                -->
+                 <p class="packages-subtext">
+                     <?php echo t('home.packages_additional_info'); ?>
+                 </p>
             </div>
         </div>
     </section>

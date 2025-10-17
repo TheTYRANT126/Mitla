@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
         startAutoPlay: function () {
             this.interval = setInterval(() => {
                 this.nextSlide();
-            }, 5000); // Cambia cada 5 segundos
+            }, 2000); // Cambia cada 2 segundos
         },
 
         pauseAutoPlay: function () {
