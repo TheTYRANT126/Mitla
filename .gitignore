@@ -1,0 +1,6 @@
+# Archivos grandes que exceden el límite de 100MB
+assets/video/paquete-1-hero.mp4
+assets/video/paquete-2-hero.mp4
+
+# Omitir el archivo de configuración de LFS para evitar conflictos
+.gitattributes

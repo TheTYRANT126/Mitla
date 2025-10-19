@@ -1,1 +1,623 @@
-paquetes.css
+/**
+ * ============================================
+ * RUTA: assets/css/paquetes.css
+ * ============================================
+ * Estilos específicos para página de paquetes
+ */
+
+/* ====== VARIABLES CONFIGURABLES ====== */
+:root {
+    /* 🔧 AJUSTABLE: Color y transparencia del texto del botón NO activo. */
+    /* Usa 'white', '#FFFFFF' o rgba(255, 255, 255, 0.7) para añadir transparencia. */
+    --btn-selector-color-texto: rgba(255, 255, 255, 0.7);
+    /* Texto para botones no activos */
+    /* 🔧 AJUSTABLE: Color del texto del botón ACTIVO. */
+    --btn-selector-color-texto-active: white;
+    /* Texto para el botón activo */
+    /* 🔧 AJUSTABLE: Color y transparencia del fondo del botón NO activo. */
+    /* Usa el formato rgba(R, G, B, A) donde: */
+    /* R, G, B son los valores del color (0-255) y A es la transparencia (0.0 a 1.0). */
+    --btn-selector-bg: rgba(128, 128, 128, 0);
+    /* Gris semitransparente por defecto */
+    --btn-selector-bg-active: none;
+    --btn-selector-tamano-texto: 1.9rem;
+    /* 🔧 AJUSTABLE: Tamaño del texto del botón ACTIVO. */
+    --btn-selector-tamano-texto-active: 3rem;
+    /* Valor por defecto: 2.5rem */
+}
+
+/* ====== HERO SECTION CON VIDEO ====== */
+.paquetes-hero-section {
+    position: relative;
+    /* 🔧 AJUSTABLE: Altura de la sección del video */
+    /* Aumenta este valor para hacer el video más alto */
+    height: 650px;
+    overflow: hidden;
+}
+
+.hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.hero-video.active {
+    opacity: 1;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+/* ====== SELECTORES DE PAQUETES (PARTE SUPERIOR) ====== */
+.package-selectors {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.package-selector-btn {
+    background: none;
+    border: none;
+    color: var(--btn-selector-color-texto);
+    font-size: var(--btn-selector-tamano-texto);
+    font-weight: 700;
+    padding: 20px 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    background-color: var(--btn-selector-bg);
+    border-radius: 8px;
+    transform: scale(0.9);
+}
+
+.package-selector-btn.active {
+    background: var(--btn-selector-bg-active);
+    font-size: var(--btn-selector-tamano-texto-active);
+    color: var(--btn-selector-color-texto-active);
+    transform: scale(1);
+}
+
+.package-selector-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ====== FIGURA DE TRANSICIÓN (HEXÁGONO) ====== */
+.transition-shape {
+    position: relative;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* 🔧 AJUSTABLE: Traer al frente */
+    /* Un z-index alto asegura que este elemento esté por encima de otros (como el video) */
+    z-index: 5;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+}
+
+.hexagon {
+    position: relative;
+    /* 🔧 AJUSTABLE: Ancho del hexágono */
+    width: 400px;
+    /* 🔧 AJUSTABLE: Alto del hexágono */
+    height: 100px;
+    background: linear-gradient(135deg, #0066cc, #0052a3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+    /* 🔧 AJUSTABLE: Posición del hexágono */
+    /* El primer valor (0px) es el eje X (horizontal): positivo a la derecha, negativo a la izquierda */
+    /* El segundo valor (0px) es el eje Y (vertical): positivo hacia abajo, negativo hacia arriba */
+    transform: translate(0px, -50px);
+}
+
+.hexagon span {
+    color: white;
+    /* 🔧 AJUSTABLE: Tamaño del texto dentro del hexágono */
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ====== CUADRÍCULA DE INFORMACIÓN (2 COLUMNAS) ====== */
+.info-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+}
+
+/* ========================================
+   ASIGNACIÓN DE BLOQUES EN EL GRID
+   ======================================== */
+
+/* FILA 1 */
+.horario-block {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.precio-block {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* FILA 2 */
+.plan-block {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.gallery-block {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* FILA 3 */
+.guias-block {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+.servicios-block {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+/* FILA 4 */
+.transporte-block {
+    grid-column: 1;
+    grid-row: 4;
+}
+
+.infraestructura-block {
+    grid-column: 2;
+    grid-row: 4;
+}
+
+/* FILA 5 */
+.lugares-block {
+    grid-column: 1;
+    grid-row: 5;
+}
+
+.recomendaciones-block {
+    grid-column: 2;
+    grid-row: 5;
+}
+
+/* ========================================
+   ESTILOS GENERALES DEL BLOQUE
+   ======================================== */
+.info-block {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    transition: transform 0.2s ease;
+
+    /* 🔧 AJUSTABLE: Altura de cada bloque */
+    min-height: 200px;
+}
+
+.info-block:hover {
+    transform: translateY(-5px);
+}
+
+/* ========================================
+   CONTROL DE ÍCONOS (TODOS A LA VEZ)
+   ======================================== */
+.info-icon {
+    flex-shrink: 0;
+
+    /* 🔧 AJUSTABLE: Tamaño del ícono */
+    width: 50px !important;
+    height: 50px !important;
+
+    /* 🔧 AJUSTABLE: Posición X del ícono (desplazamiento horizontal) xdxdxd */
+    /* Valores negativos lo mueven a la izquierda, positivos a la derecha */
+    margin-left: -250px !important;
+
+    /* 🔧 AJUSTABLE: Posición Y del ícono (desplazamiento vertical) */
+    /* Valores negativos lo mueven arriba, positivos abajo */
+    margin-top: -60px !important;
+
+    /* 🔧 AJUSTABLE: Separación entre ícono y texto */
+    margin-right: 15px !important;
+}
+
+/* ========================================
+   CONTROL DE ÍCONOS (INDIVIDUAL)
+   ======================================== */
+
+/* 🔧 AJUSTABLE: Posición del ícono en el bloque "Plan de visita" */
+.plan-block .info-icon {
+    margin-left: -250px !important;
+    /* Eje X */
+    margin-top: -80px !important;
+    /* Eje Y */
+}
+
+/* 🔧 AJUSTABLE: Posición del ícono en el bloque "Designación de guías" */
+.guias-block .info-icon {
+    margin-left: -250px !important;
+    /* Eje X */
+    margin-top: -85px !important;
+    /* Eje Y */
+}
+
+/* 🔧 AJUSTABLE: Posición del ícono en el bloque "Servicios ofrecidos" */
+.servicios-block .info-icon {
+    margin-left: -250px !important;
+    /* Eje X */
+    margin-top: -80px !important;
+    /* Eje Y */
+}
+
+.info-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* ========================================
+   CONTROL DEL CONTENIDO DE TEXTO
+   ======================================== */
+.info-content {
+    flex: 1;
+
+    /* 🔧 AJUSTABLE: Desplazamiento horizontal del texto */
+    /* Valores negativos mueven a la izquierda, positivos a la derecha */
+    margin-left: 90px !important;
+
+    /* 🔧 AJUSTABLE: Desplazamiento vertical del texto */
+    /* Valores negativos mueven arriba, positivos abajo */
+    margin-top: 0px !important;
+}
+
+.info-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.info-content p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+/* ========================================
+   ALTURA INDIVIDUAL POR BLOQUE
+   ======================================== */
+
+/* 🔧 AJUSTABLE: Altura del bloque Horario */
+.horario-block {
+    min-height: 200px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Precio */
+.precio-block {
+    min-height: 200px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Plan de visita */
+.plan-block {
+    min-height: 250px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Designación de guías */
+.guias-block {
+    min-height: 250px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Servicios ofrecidos */
+.servicios-block {
+    min-height: 200px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Transporte */
+.transporte-block {
+    min-height: 200px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Infraestructura */
+.infraestructura-block {
+    min-height: 200px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Lugares cercanos */
+.lugares-block {
+    min-height: 200px !important;
+}
+
+/* 🔧 AJUSTABLE: Altura del bloque Recomendaciones */
+.recomendaciones-block {
+    min-height: 200px !important;
+}
+
+/* ========================================
+   GALERÍA DE IMÁGENES - Compatible con JS
+   ======================================== */
+.gallery-block {
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+
+    /* 🔧 AJUSTABLE: xdxdxdxddddPosición vertical de la galería. */
+    /* Un valor negativo la sube, un valor positivo la baja. */
+
+
+    /* 🔧 AJUSTABLE: Altura de la galería */
+    min-height: 200px;
+}
+
+.gallery-block:hover {
+    /* Mantiene la posición vertical y anula el efecto hover del info-block */
+    transform: translateY(-30px);
+}
+
+.image-gallery {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    /* 🔧 AJUSTABLE: Altura mínima de la galería */
+    min-height: 250px;
+
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    transform: scale(0.95);
+    transition: all 0.8s ease;
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+}
+
+/* La imagen activa se muestra completamente */
+.gallery-item.active {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 10 !important;
+}
+
+/* Efecto hover adicional */
+.gallery-item:hover {
+    opacity: 1;
+    transform: scale(1.02);
+}
+
+.gallery-item:hover .gallery-img {
+    transform: scale(1.05);
+}
+
+/* Estilos para el texto sobre la imagen */
+.gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transform: translateY(100%);
+    transition: transform 0.5s ease;
+}
+
+.gallery-item.active .gallery-caption {
+    transform: translateY(0);
+}
+
+/* Estilos para los botones de navegación de la galería */
+.gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 15;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.gallery-nav-btn:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.gallery-nav-prev {
+    left: 15px;
+}
+
+.gallery-nav-next {
+    right: 15px;
+}
+
+/* ====== PRECIOS CON USD ====== */
+.precio-item {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.precio-mxn {
+    font-weight: 700;
+    color: #333;
+}
+
+.precio-usd {
+    font-weight: 600;
+    color: #0066cc;
+}
+
+/* ====== BOTÓN DE RESERVAR ====== */
+.btn-reservar {
+    padding: 15px 50px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-reservar:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+}
+
+.reservas-aviso {
+    color: #dc3545;
+    font-weight: 700;
+    font-size: 0.95rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ====== DISEÑO RESPONSIVE ====== */
+
+/* Tablets (1 columna) */
+@media (max-width: 992px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-block,
+    .gallery-block {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+    }
+
+    .image-gallery {
+        min-height: 250px;
+    }
+}
+
+/* Móviles */
+@media (max-width: 767px) {
+    .info-block {
+        flex-direction: column;
+        align-items: center;
+        /* <-- AÑADIDO: Centra el contenido horizontalmente */
+        text-align: center;
+        padding: 15px;
+    }
+
+    .info-icon {
+        /* 🔧 AJUSTABLE (MÓVIL): Posición de los íconos en vista móvil. */
+        /* Valores negativos mueven arriba, positivos abajo. */
+        margin-top: -120px !important;
+        /* Valores negativos mueven a la izquierda, positivos a la derecha. */
+        margin-left: 0px !important;
+
+        margin-bottom: 10px;
+        margin-right: 0 !important;
+        align-self: center;
+        /* Mantiene el ícono centrado por defecto */
+    }
+
+    /* 🔧 AJUSTABLE (MÓVIL): Posición especial para un grupo de íconos. */
+    /* Estos 3 íconos tendrán una posición diferente al resto en la vista móvil. */
+    .plan-block .info-icon,
+    .guias-block .info-icon,
+    .servicios-block .info-icon {
+        /* Cambia este valor para moverlos verticalmente. */
+        /* Un valor menos negativo los bajará. Ej: -80px */
+        margin-top: -140px !important;
+        /* Cambia este valor para moverlos horizontalmente (si es necesario). */
+        margin-left: 0px !important;
+    }
+
+    .info-content {
+        margin-left: 0 !important;
+    }
+
+    .paquetes-hero-section {
+        height: 350px;
+    }
+
+    .package-selectors {
+        flex-direction: column;
+        gap: 15px;
+        top: 15px;
+    }
+
+    .package-selector-btn {
+        font-size: 1.2rem;
+        padding: 15px 20px;
+    }
+
+    .package-selector-btn.active {
+        font-size: 1.5rem;
+    }
+
+    .image-gallery {
+        min-height: 220px;
+    }
+
+    /* 🔧 AJUSTABLE (MÓVIL): Posición vertical de la galería en vista móvil. */
+    .gallery-block {
+        /* Un valor negativo la sube, un valor positivo la baja. */
+        transform: translateY(-50px);
+    }
+
+    .gallery-block:hover {
+        /* Mantiene la misma posición al interactuar en móvil. */
+        transform: translateY(0px);
+    }
+}
