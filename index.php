@@ -1,11 +1,5 @@
 <?php
-/**
- * ============================================
- * RUTA: index.php (raíz del proyecto)
- * ============================================
- * Página Principal - Mitla Tours
- * Sistema de Reservaciones con Animaciones
- */
+
 
 require_once __DIR__ . '/config/config.php';
 
@@ -106,7 +100,7 @@ $lang = getLanguage();
                     <p class="lead mb-4 animate-fade-in-delay">
                         Vive una experiencia única con guías certificados
                     </p>
-                    <a href="/pages/paquetes.php" class="btn btn-primary btn-lg animate-fade-in-delay-2">
+                    <a href="pages/paquetes.php" class="btn btn-primary btn-lg animate-fade-in-delay-2">
                         <i class="fas fa-calendar-check"></i> Reservar Ahora
                     </a>
                 </div>
@@ -191,7 +185,7 @@ $lang = getLanguage();
     <!-- Paquetes Destacados con Hover Effects -->
     <section class="packages bg-light py-5">
         <div class="container">
-            <h2 class="text-center mb-5">Paquetes destacados</h2>
+            <h2 class="text-center mb-5">Conoce nuestros paquetes</h2>
             
             <div class="row">
                 <?php
@@ -242,7 +236,7 @@ $lang = getLanguage();
                                 </p>
                             </div>
                             
-                            <a href="/pages/reservar.php?id=<?php echo $paquete['id_paquete']; ?>" 
+                            <a href="pages/paquetes.php?id=<?php echo $paquete['id_paquete']; ?>"
                                class="btn btn-primary w-100 mt-3">
                                 <i class="fas fa-calendar-alt"></i> Reservar
                             </a>
