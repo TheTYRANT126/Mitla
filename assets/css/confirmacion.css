@@ -1,0 +1,412 @@
+/* ====== SECCIÓN DE CONFIRMACIÓN ====== */
+.confirmation-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 50px 0;
+}
+
+/* ====== MENSAJE DE ÉXITO ====== */
+.success-message {
+    color: white;
+    margin-bottom: 40px;
+}
+
+.success-icon {
+    /* 🔧 AJUSTABLE: Tamaño del ícono de éxito */
+    font-size: 5rem;
+    margin-bottom: 20px;
+    animation: scaleIn 0.6s ease-out;
+}
+
+.success-title {
+    /* 🔧 AJUSTABLE: Tamaño del título de éxito */
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.success-subtitle {
+    /* 🔧 AJUSTABLE: Tamaño del subtítulo */
+    font-size: 1.2rem;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease-out;
+}
+
+/* ====== CONTENEDOR DEL TICKET ====== */
+.ticket-container {
+    background-color: white;
+    /* 🔧 AJUSTABLE: Radio de bordes del ticket */
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ticket-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ====== HEADER DEL TICKET ====== */
+.ticket-header {
+    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    color: white;
+    /* 🔧 AJUSTABLE: Padding del header */
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.ticket-logo img {
+    /* 🔧 AJUSTABLE: Altura del logo */
+    height: 50px;
+    width: auto;
+}
+
+.ticket-logo h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.ticket-code {
+    text-align: right;
+}
+
+.code-label {
+    /* 🔧 AJUSTABLE: Tamaño de fuente de la etiqueta */
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.code-value {
+    /* 🔧 AJUSTABLE: Tamaño del código de reservación */
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+}
+
+/* ====== DIVIDER ====== */
+.ticket-divider {
+    height: 2px;
+    background: repeating-linear-gradient(90deg,
+            #0066cc 0px,
+            #0066cc 10px,
+            transparent 10px,
+            transparent 20px);
+    margin: 0 30px;
+}
+
+/* ====== BODY DEL TICKET ====== */
+.ticket-body {
+    /* 🔧 AJUSTABLE: Padding del cuerpo del ticket */
+    padding: 40px;
+}
+
+.ticket-section {
+    /* 🔧 AJUSTABLE: Espacio entre secciones */
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.ticket-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-title {
+    /* 🔧 AJUSTABLE: Tamaño del título de sección */
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0066cc;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background-color: #0066cc;
+    margin-right: 10px;
+    border-radius: 2px;
+}
+
+/* ====== FILAS DE INFORMACIÓN ====== */
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* 🔧 AJUSTABLE: Espacio entre filas */
+    margin-bottom: 15px;
+    /* 🔧 AJUSTABLE: Tamaño de fuente de las filas */
+    font-size: 1rem;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-label i {
+    /* 🔧 AJUSTABLE: Color de los íconos */
+    color: #0066cc;
+    width: 20px;
+    text-align: center;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}
+
+.total-price {
+    /* 🔧 AJUSTABLE: Tamaño del precio total */
+    font-size: 1.5rem;
+    color: #28a745;
+    font-weight: 700;
+}
+
+/* ====== FOOTER DEL TICKET ====== */
+.ticket-footer {
+    background-color: #f8f9fa;
+    margin: 0 -40px;
+    padding: 30px 40px;
+    border-top: 2px solid #e9ecef;
+}
+
+.ticket-footer .alert {
+    margin-bottom: 0;
+    border-radius: 10px;
+}
+
+/* ====== ACCIONES DEL TICKET ====== */
+.ticket-actions {
+    margin-top: 30px;
+}
+
+.ticket-actions .btn {
+    /* 🔧 AJUSTABLE: Padding de los botones */
+    padding: 12px 30px;
+    /* 🔧 AJUSTABLE: Tamaño de fuente de los botones */
+    font-size: 1.1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.ticket-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ====== INFORMACIÓN ADICIONAL ====== */
+.additional-info {
+    background-color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.additional-info h3 {
+    /* 🔧 AJUSTABLE: Tamaño del título de info adicional */
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.info-card {
+    background-color: #f8f9fa;
+    /* 🔧 AJUSTABLE: Padding de las tarjetas de info */
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.info-card:hover {
+    background-color: white;
+    border-color: #0066cc;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 102, 204, 0.2);
+}
+
+.info-card i {
+    /* 🔧 AJUSTABLE: Color de íconos de info cards */
+    color: #0066cc;
+}
+
+.info-card h5 {
+    /* 🔧 AJUSTABLE: Tamaño del título de info card */
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.info-card p {
+    color: #666;
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+/* ====== ANIMACIONES ====== */
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ====== ESTILOS PARA IMPRESIÓN ====== */
+@media print {
+    body {
+        background: white;
+    }
+
+    .confirmation-section {
+        background: white;
+        padding: 0;
+        min-height: auto;
+    }
+
+    .navbar,
+    footer,
+    .ticket-actions,
+    .additional-info,
+    .success-message {
+        display: none !important;
+    }
+
+    .ticket-container {
+        box-shadow: none;
+        border: 2px solid #dee2e6;
+        page-break-inside: avoid;
+    }
+
+    .ticket-header {
+        background: #0066cc !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+    .confirmation-section {
+        padding: 30px 15px;
+    }
+
+    .success-icon {
+        /* 🔧 AJUSTABLE: Tamaño del ícono en móviles */
+        font-size: 3rem;
+    }
+
+    .success-title {
+        /* 🔧 AJUSTABLE: Tamaño del título en móviles */
+        font-size: 1.8rem;
+    }
+
+    .success-subtitle {
+        /* 🔧 AJUSTABLE: Tamaño del subtítulo en móviles */
+        font-size: 1rem;
+    }
+
+    .ticket-header {
+        /* 🔧 AJUSTABLE: Padding del header en móviles */
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .ticket-code {
+        text-align: center;
+    }
+
+    .code-value {
+        /* 🔧 AJUSTABLE: Tamaño del código en móviles */
+        font-size: 1.3rem;
+        padding: 8px 15px;
+    }
+
+    .ticket-body {
+        /* 🔧 AJUSTABLE: Padding del body en móviles */
+        padding: 25px 20px;
+    }
+
+    .section-title {
+        /* 🔧 AJUSTABLE: Tamaño del título de sección en móviles */
+        font-size: 1.1rem;
+    }
+
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .info-value {
+        text-align: left;
+    }
+
+    .ticket-actions .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0 !important;
+    }
+
+    .additional-info {
+        padding: 25px 20px;
+    }
+
+    .additional-info h3 {
+        /* 🔧 AJUSTABLE: Tamaño del título de info adicional en móviles */
+        font-size: 1.5rem;
+    }
+}
+
+/* ====== BADGES ====== */
+.badge {
+    /* 🔧 AJUSTABLE: Padding de los badges */
+    padding: 8px 15px;
+    /* 🔧 AJUSTABLE: Tamaño de fuente de los badges */
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 20px;
+}

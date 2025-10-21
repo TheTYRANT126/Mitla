@@ -21,9 +21,29 @@
     /* Gris semitransparente por defecto */
     --btn-selector-bg-active: none;
     --btn-selector-tamano-texto: 1.9rem;
+
     /* 🔧 AJUSTABLE: Tamaño del texto del botón ACTIVO. */
     --btn-selector-tamano-texto-active: 3rem;
     /* Valor por defecto: 2.5rem */
+
+}
+
+/* ====== ESTADO INICIAL DE LOS BLOQUES (evita flash al cargar) ====== */
+.info-block {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.info-block.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Excepción para la galería - mantiene su posición personalizada */
+.gallery-block.visible {
+    transform: translateY(-30px);
+    /* O el valor que hayas configurado */
 }
 
 /* ====== HERO SECTION CON VIDEO ====== */
@@ -69,9 +89,15 @@
     position: absolute;
     z-index: 2;
     display: flex;
-    gap: 40px;
     align-items: center;
-    top: 50px;
+
+    /* 🔧 AJUSTABLE: Posición vertical de los botones. */
+    /* Un valor mayor los baja, un valor menor los sube. */
+    top: 80px;
+
+    /* 🔧 AJUSTABLE: Espacio entre los botones. */
+    gap: 40px;
+
     left: 50%;
     transform: translateX(-50%);
 }
@@ -227,7 +253,8 @@
     min-height: 200px;
 }
 
-.info-block:hover {
+/* El :not(.gallery-block) evita que este efecto se aplique a la galería */
+.info-block:not(.gallery-block):hover {
     transform: translateY(-5px);
 }
 
@@ -374,18 +401,23 @@
     overflow: hidden;
     background: transparent;
 
-    /* 🔧 AJUSTABLE: xdxdxdxddddPosición vertical de la galería. */
+    /* 🔧 AJUSTABLE: Posición vertical de la galería. */
     /* Un valor negativo la sube, un valor positivo la baja. */
-
+    transform: translateY(-40px);
+    /* ⬅️ AGREGA ESTA LÍNEA */
 
     /* 🔧 AJUSTABLE: Altura de la galería */
     min-height: 200px;
 }
 
+
 .gallery-block:hover {
     /* Mantiene la posición vertical y anula el efecto hover del info-block */
-    transform: translateY(-30px);
+    transform: translateY(-40px);
 }
+
+/* En paquetes.css, busca esta regla y modifícala: */
+
 
 .image-gallery {
     position: relative;
@@ -618,6 +650,17 @@
 
     .gallery-block:hover {
         /* Mantiene la misma posición al interactuar en móvil. */
-        transform: translateY(0px);
+        transform: translateY(-50px);
     }
+}
+
+/* ====== MAPA WIDGET ====== */
+.map-widget-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }

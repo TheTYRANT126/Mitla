@@ -1,9 +1,4 @@
-/**
- * ============================================
- * RUTA: assets/js/paquetes.js
- * ============================================
- * JavaScript para página de paquetes
- */
+
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -169,26 +164,33 @@ document.addEventListener('DOMContentLoaded', function () {
     // ====== ANIMACIÓN DE ENTRADA ======
 
     /**
-     * Observador para animar elementos al aparecer
+     * Observador para animar elementos al aparecer usando clases CSS.
      */
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver(function (entries) {
+    const observer = new IntersectionObserver(function (entries, observer) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('visible');
+                // Dejar de observar el elemento una vez que ha sido animado para mejorar rendimiento.
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Observar bloques de información
-    document.querySelectorAll('.info-block').forEach(block => {
+    // Observar todos los bloques de información EXCEPTO la galería.
+    document.querySelectorAll('.info-block:not(.gallery-block)').forEach(block => {
         observer.observe(block);
     });
+
+    // Observar la galería por separado para que también reciba la clase 'visible'.
+    const galleryBlock = document.querySelector('.gallery-block');
+    if (galleryBlock) {
+        observer.observe(galleryBlock);
+    }
 
 
     // ====== LOG DE DEBUG ======

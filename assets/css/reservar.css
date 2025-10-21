@@ -1,0 +1,475 @@
+/* ====== BANNER DEL PAQUETE ====== */
+.package-banner {
+    position: relative;
+    /* 🔧 AJUSTABLE: Altura del banner */
+    height: 300px;
+}
+
+.banner-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+/* 🔧 AJUSTABLE: Transparencia del overlay del banner */
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    /* Ejemplo: menos oscuro */
+    /* Cambia 0.3 para más/menos oscuridad (0=transparente, 1=opaco) */
+    z-index: 1;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.banner-title {
+    color: white;
+    /* 🔧 AJUSTABLE: Tamaño del título del banner */
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
+    text-align: center;
+    transition: transform 0.3s ease, font-size 0.3s ease;
+}
+
+/* ====== BOTÓN DE REGRESAR ====== */
+.btn-back {
+    /* 🔧 AJUSTABLE: Color de fondo del botón */
+    background-color: #0066cc;
+
+    /* 🔧 AJUSTABLE: Color del texto del botón */
+    color: white;
+
+    border: none;
+
+    /* 🔧 AJUSTABLE: Tamaño del botón (padding) */
+    padding: 12px 30px;
+
+    /* 🔧 AJUSTABLE: Tamaño de fuente del botón */
+    font-size: 1rem;
+
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    /* 🔧 AJUSTABLE: Posición del botón (desplazamiento) */
+    /* Usa transform: translate(X, Y); para moverlo. X es horizontal, Y es vertical. */
+    transform: translate(0px, 110px);
+
+    /* Asegura que el botón esté por encima de otros elementos */
+    position: relative;
+    z-index: 10;
+}
+
+.btn-back:hover {
+    /* 🔧 AJUSTABLE: Color al hacer hover */
+    background-color: #0052a3;
+    transform: translate(0px, 110px);
+    /* Mantiene la posición vertical original */
+    box-shadow: 0 5px 15px rgba(0, 102, 204, 0.4);
+}
+
+.btn-back i {
+    /* 🔧 AJUSTABLE: Espacio entre el ícono y el texto */
+    margin-right: 8px;
+}
+
+/* ====== SECCIONES DEL FORMULARIO ====== */
+.reservation-form-section {
+    background-color: #f8f9fa;
+}
+
+.reservation-form {
+    background-color: white;
+    /* 🔧 AJUSTABLE: Radio de bordes del formulario */
+    border-radius: 15px;
+    /* 🔧 AJUSTABLE: Padding interno del formulario */
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    /* 🔧 AJUSTABLE: Espacio entre secciones del formulario */
+    margin-bottom: 35px;
+    /* 🔧 AJUSTABLE: Padding inferior de cada sección */
+    padding-bottom: 25px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.section-title {
+    /* 🔧 AJUSTABLE: Tamaño del título de sección */
+    font-size: 1.5rem;
+    font-weight: 700;
+    /* 🔧 AJUSTABLE: Color del título */
+    color: #0066cc;
+    /* 🔧 AJUSTABLE: Espacio debajo del título */
+    margin-bottom: 20px;
+}
+
+/* ====== CAMPOS DEL FORMULARIO ====== */
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+    padding: 12px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+}
+
+/* ====== SELECTOR DE LUGARES ====== */
+.lugares-selector {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.lugares-selector .input-group {
+    /* 🔧 AJUSTABLE: Altura de los botones y campo de lugares */
+    height: 60px;
+}
+
+.lugares-selector .form-control {
+    /* 🔧 AJUSTABLE: Tamaño de fuente del número de lugares */
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-left: none;
+    border-right: none;
+}
+
+.btn-decrement,
+.btn-increment {
+    /* 🔧 AJUSTABLE: Ancho de los botones +/- */
+    width: 60px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.btn-decrement {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.btn-increment {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* ====== INFORMACIÓN DE GUÍAS ====== */
+.guias-info {
+    text-align: center;
+    /* 🔧 AJUSTABLE: Tamaño de fuente de info de guías */
+    font-size: 1.1rem;
+    font-weight: 600;
+    /* 🔧 AJUSTABLE: Color del texto de guías */
+    color: #28a745;
+    /* 🔧 AJUSTABLE: Padding del contenedor */
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.guias-info i {
+    /* 🔧 AJUSTABLE: Espacio entre ícono y texto */
+    margin-right: 10px;
+}
+
+/* ====== RESUMEN DE PRECIOS ====== */
+.price-summary {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+}
+
+.price-breakdown {
+    /* 🔧 AJUSTABLE: Tamaño de fuente de precios */
+    font-size: 1.1rem;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* 🔧 AJUSTABLE: Espacio entre items de precio */
+    margin-bottom: 15px;
+}
+
+.price-item span:first-child {
+    font-weight: 600;
+    color: #555;
+}
+
+.price-mxn {
+    font-weight: 700;
+    color: #333;
+}
+
+.price-usd {
+    font-weight: 600;
+    color: #0066cc;
+}
+
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* 🔧 AJUSTABLE: Tamaño de fuente del total */
+    font-size: 1.5rem;
+    font-weight: 700;
+    /* 🔧 AJUSTABLE: Color del total */
+    color: #0066cc;
+    margin-top: 15px;
+}
+
+.total-mxn {
+    color: #333;
+}
+
+.total-usd {
+    color: #0066cc;
+}
+
+/* ====== BOTÓN DE PAGAR ====== */
+.btn-pagar {
+    /* 🔧 AJUSTABLE: Padding del botón de pagar */
+    padding: 15px 60px;
+
+    /* 🔧 AJUSTABLE: Tamaño de fuente del botón */
+    font-size: 1.3rem;
+
+    font-weight: 700;
+    border-radius: 50px;
+
+    /* 🔧 AJUSTABLE: Color de fondo del botón */
+    background-color: #28a745;
+    border-color: #28a745;
+
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+
+    /* 🔧 AJUSTABLE: Posición del botón (desplazamiento) */
+    /* Valores positivos lo mueven a la derecha/abajo, negativos a izquierda/arriba */
+    transform: translate(0px, 0px);
+}
+
+.btn-pagar:hover {
+    /* 🔧 AJUSTABLE: Color al hacer hover */
+    background-color: #218838;
+    border-color: #1e7e34;
+    transform: translate(0px, -3px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-pagar i {
+    margin-right: 10px;
+}
+
+/* ====== WIDGET DE CLIMA ====== */
+.weather-widget {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+#weatherWidget {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ====== MENSAJES DE DISPONIBILIDAD ====== */
+.disponibilidad-info {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.disponibilidad-info.disponible {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.disponibilidad-info.completo {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.disponibilidad-info.cupos-limitados {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+    .package-banner {
+        /* 🔧 AJUSTABLE: Altura del banner en móviles */
+        height: 200px;
+    }
+
+    .banner-title {
+        /* 🔧 AJUSTABLE (MÓVIL): Tamaño y posición del título en móviles */
+        /* Por defecto, el título se centra. */
+
+        /* Tamaño de fuente para móviles */
+        font-size: 1.8rem;
+        /* Usa translate(X, Y) para ajustes finos de posición si es necesario. */
+        transform: translate(0px, 0px);
+    }
+
+    .btn-back {
+        /* 🔧 AJUSTABLE: Padding del botón en móviles */
+        padding: 10px 20px;
+        font-size: 0.9rem;
+
+        /* 🔧 AJUSTABLE (MÓVIL): Posición del botón en móviles */
+        /* Cambia los valores de X e Y para ajustar la posición. */
+        transform: translate(0px, 70px);
+    }
+
+    .btn-back:hover {
+        /* Mantiene la misma posición al interactuar en móvil. */
+        transform: translate(0px, 70px);
+    }
+
+    .reservation-form {
+        /* 🔧 AJUSTABLE: Padding del formulario en móviles */
+        padding: 25px 20px;
+    }
+
+    .section-title {
+        /* 🔧 AJUSTABLE: Tamaño del título de sección en móviles */
+        font-size: 1.3rem;
+    }
+
+    .price-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .price-total {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .btn-pagar {
+        /* 🔧 AJUSTABLE: Tamaño del botón de pagar en móviles */
+        padding: 12px 40px;
+        font-size: 1.1rem;
+        width: 100%;
+    }
+
+    .lugares-selector .input-group {
+        /* 🔧 AJUSTABLE: Altura de selector de lugares en móviles */
+        height: 50px;
+    }
+}
+
+/* ====== ESTILOS PARA ESCRITORIO (SOBREESCRIBE LOS DE MÓVIL) ====== */
+@media (min-width: 769px) {
+    .banner-title {
+        /* 🔧 AJUSTABLE (ESCRITORIO): Posición del título en vista de escritorio */
+        /* El valor negativo en X lo mueve a la izquierda. */
+        transform: translate(-320px, 0px);
+        font-size: 3.5rem;
+    }
+}
+
+/* ====== ANIMACIONES ====== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-section {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* ====== ESTADOS DE VALIDACIÓN ====== */
+.was-validated .form-control:valid,
+.was-validated .form-select:valid {
+    border-color: #28a745;
+}
+
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+    border-color: #dc3545;
+}
+
+/* ====== LOADING SPINNER ====== */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ocultar spinner por defecto */
+.btn-pagar .loading-spinner {
+    display: none;
+    margin-left: 10px;
+}
+
+.btn-pagar.loading .loading-spinner {
+    display: inline-block;
+}

@@ -1,10 +1,5 @@
 <?php
-/**
- * ============================================
- * RUTA: pages/paquetes.php
- * ============================================
- * Página de Paquetes - Información Detallada
- */
+
 
 require_once __DIR__ . '/../config/config.php';
 
@@ -341,6 +336,22 @@ $horarios = $db->fetchAll(
             </div>
             <!-- FIN DE LA NUEVA CUADRÍCULA DE INFORMACIÓN -->
             
+            <!-- Mapa del Recorrido -->
+            <div class="map-section text-center my-5">
+                <h3 class="mb-4">Mapa del Recorrido</h3>
+                <div class="map-widget-container">
+                    <?php if ($paquete_actual['id_paquete'] == 1): ?>
+                        <!-- Mapa para Cuevas de Unión Zapata -->
+                        <iframe frameBorder="0" scrolling="no" src="https://es.wikiloc.com/wikiloc/embedv2.do?id=181194053&elevation=off&images=off&maptype=H" width="100%" height="500"></iframe>
+                        <div style="color:#777;font-size:11px;line-height:16px;">Powered by <a style="color:#4C8C2B;font-size:11px;line-height:16px;" target="_blank" href="https://es.wikiloc.com">Wikiloc</a></div>
+                    <?php elseif ($paquete_actual['id_paquete'] == 2): ?>
+                        <!-- Mapa para Cuevas Prehistóricas de Mitla -->
+                        <iframe frameBorder="0" scrolling="no" src="https://es.wikiloc.com/wikiloc/embedv2.do?id=97179823&elevation=off&images=off&maptype=H" width="100%" height="500"></iframe>
+                        <div style="color:#777;font-size:11px;line-height:16px;">Powered by <a style="color:#4C8C2B;font-size:11px;line-height:16px;" target="_blank" href="https://es.wikiloc.com">Wikiloc</a></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
             <!-- Botón de Reservar -->
             <div class="text-center mt-5">
                 <a href="<?php echo SITE_URL; ?>/pages/reservar.php?id=<?php echo $paquete_actual['id_paquete']; ?>" 
