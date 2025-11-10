@@ -230,45 +230,69 @@ $lang = getLanguage();
                         </div>
                         
                         <!-- Resumen de Precio -->
-                        <div class="form-section price-summary">
-                            <h3 class="section-title">Resumen</h3>
-                            
-                            <div class="price-breakdown">
-                                <div class="price-item">
-                                    <span>Entrada al sitio por persona:</span>
-                                    <span>
-                                        <span class="price-mxn" data-price="<?php echo $paquete['precio_entrada_persona']; ?>">
-                                            $<?php echo number_format($paquete['precio_entrada_persona'], 2); ?> mxn
-                                        </span> / 
-                                        <span class="price-usd" data-mxn="<?php echo $paquete['precio_entrada_persona']; ?>">
-                                            $0.00 USD
-                                        </span>
-                                    </span>
-                                </div>
-                                
-                                <div class="price-item">
-                                    <span>Guía:</span>
-                                    <span>
-                                        <span class="price-mxn" data-price="<?php echo $paquete['precio_guia']; ?>">
-                                            $<?php echo number_format($paquete['precio_guia'], 2); ?> mxn
-                                        </span> / 
-                                        <span class="price-usd" data-mxn="<?php echo $paquete['precio_guia']; ?>">
-                                            $0.00 USD
-                                        </span>
-                                    </span>
-                                </div>
-                                
-                                <hr>
-                                
-                                <div class="price-total">
-                                    <span>Total:</span>
-                                    <span>
-                                        <span class="total-mxn">$0.00 mxn</span> / 
-                                        <span class="total-usd">$0.00 USD</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+<div class="form-section price-summary">
+    <h3 class="section-title">Resumen</h3>
+    
+    <div class="price-breakdown">
+        <!-- Entrada al sitio -->
+        <div class="price-item">
+            <span>Entrada al sitio por persona:</span>
+            <span>
+                <span class="price-mxn-unitario" style="font-size: 0.9rem; color: #666;">
+                    $<?php echo number_format($paquete['precio_entrada_persona'], 2); ?> mxn
+                </span> / 
+                <span class="price-usd-unitario" data-mxn="<?php echo $paquete['precio_entrada_persona']; ?>" style="font-size: 0.9rem; color: #666;">
+                    $0.00 USD
+                </span>
+            </span>
+        </div>
+        <div class="price-item">
+            <span id="contador-personas" style="font-weight: 600;">x1</span>
+            <span>
+                <span class="subtotal-entradas-mxn" style="font-weight: 700; color: #333;">
+                    $<?php echo number_format($paquete['precio_entrada_persona'], 2); ?> mxn
+                </span> / 
+                <span class="subtotal-entradas-usd" style="font-weight: 700; color: #0066cc;">
+                    $0.00 USD
+                </span>
+            </span>
+        </div>
+        
+        <!-- Guía -->
+        <div class="price-item mt-3">
+            <span>Guía:</span>
+            <span>
+                <span class="price-guia-unitario" style="font-size: 0.9rem; color: #666;">
+                    $<?php echo number_format($paquete['precio_guia'], 2); ?> mxn
+                </span> / 
+                <span class="price-guia-usd-unitario" data-mxn="<?php echo $paquete['precio_guia']; ?>" style="font-size: 0.9rem; color: #666;">
+                    $0.00 USD
+                </span>
+            </span>
+        </div>
+        <div class="price-item">
+            <span id="contador-guias" style="font-weight: 600;">x1</span>
+            <span>
+                <span class="subtotal-guias-mxn" style="font-weight: 700; color: #333;">
+                    $<?php echo number_format($paquete['precio_guia'], 2); ?> mxn
+                </span> / 
+                <span class="subtotal-guias-usd" style="font-weight: 700; color: #0066cc;">
+                    $0.00 USD
+                </span>
+            </span>
+        </div>
+        
+        <hr>
+        
+        <div class="price-total">
+            <span>Total:</span>
+            <span>
+                <span class="total-mxn">$0.00 mxn</span> / 
+                <span class="total-usd">$0.00 USD</span>
+            </span>
+        </div>
+    </div>
+</div>
                         
                         <!-- Botón de Pagar -->
                         <div class="text-center mt-4">
@@ -291,11 +315,13 @@ $lang = getLanguage();
                     <!-- 🔧 AJUSTABLE: Ancho del widget del clima -->
                     <!-- Cambia el valor de "max-width" para ajustar el ancho máximo del widget. Ej: "100%" para ancho completo. -->
                     <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 1000px; margin: 0 auto;">
-                        <iframe 
-                            src="https://www.meteored.mx/clima_Oaxaca+De+Juarez-America+Norte-Mexico-Oaxaca--1-22299.html" 
-                            width="100%" 
-                            height="500" 
+                        <iframe
+                            id="weather-iframe"
+                            src="https://www.meteored.mx/clima_Mitla-America+Norte-Mexico-Oaxaca--1-21105.html"
+                            width="100%"
+                            height="500"
                             frameborder="0"
+                            loading="lazy"
                             style="display: block; border: none;">
                         </iframe>
                     </div>
@@ -335,6 +361,9 @@ $lang = getLanguage();
     
     <!-- Custom JS -->
     <script src="<?php echo ASSETS_URL; ?>/js/reservar.js"></script>
-    
+
+    <!-- Easter Egg del Footer -->
+    <script src="<?php echo ASSETS_URL; ?>/js/footer-easter-egg.js"></script>
+
 </body>
 </html>

@@ -299,5 +299,8 @@ $lang = getLanguage();
             }, 300);
         });
     </script>
+
+    <!-- Easter Egg del Footer -->
+    <script src="<?php echo ASSETS_URL; ?>/js/footer-easter-egg.js"></script>
 </body>
 </html>

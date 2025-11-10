@@ -1,5 +1,35 @@
 
 
+// ====== PREVENIR SCROLL AUTOMÁTICO AL CARGAR ======
+// Bloquear scroll hasta que la página esté completamente cargada
+let scrollBlocked = true;
+
+// Prevenir scroll inmediatamente
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+// Función para mantener la página arriba
+function mantenerpaginaArriba() {
+    if (scrollBlocked) {
+        window.scrollTo(0, 0);
+    }
+}
+
+// Monitorear cualquier intento de scroll
+window.addEventListener('scroll', mantenerpaginaArriba, { passive: false });
+
+// Forzar posición arriba inmediatamente
+window.scrollTo(0, 0);
+
+// Desbloquear scroll después de que todo haya cargado
+window.addEventListener('load', function () {
+    setTimeout(function () {
+        scrollBlocked = false;
+        window.removeEventListener('scroll', mantenerpaginaArriba);
+    }, 500);
+});
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // ====== VARIABLES GLOBALES ======
@@ -47,11 +77,20 @@ document.addEventListener('DOMContentLoaded', function () {
      * Actualizar todos los precios a USD en la página
      */
     function actualizarPreciosUSD() {
+        // Actualizar precios unitarios
         document.querySelectorAll('.price-usd').forEach(elemento => {
             const precioMXN = parseFloat(elemento.getAttribute('data-mxn'));
             const precioUSD = (precioMXN * tasaCambioUSD).toFixed(2);
             elemento.textContent = '$ ' + precioUSD + ' USD';
         });
+
+        // Actualizar precio unitario de entrada
+        const precioEntradaUSD = (paqueteData.precio_entrada * tasaCambioUSD).toFixed(2);
+        document.querySelector('.price-usd-unitario').textContent = '$' + precioEntradaUSD + ' USD';
+
+        // Actualizar precio unitario de guía
+        const precioGuiaUSD = (paqueteData.precio_guia * tasaCambioUSD).toFixed(2);
+        document.querySelector('.price-guia-usd-unitario').textContent = '$' + precioGuiaUSD + ' USD';
     }
 
     // ====== VALIDACIÓN DE FECHA ======
@@ -272,13 +311,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /**
      * Actualizar información de guías necesarios
+     * 1 guía cada 5 personas
      */
     function actualizarGuias() {
         const numPersonas = parseInt(numPersonasInput.value);
-        const personasPorGuia = paqueteData.personas_por_guia;
 
-        // Calcular número de guías (mínimo 1, luego 2 por cada 10)
-        const numGuias = Math.ceil(numPersonas / personasPorGuia) * 2;
+        // Calcular número de guías: 1 guía cada 5 personas
+        // 1-5 personas = 1 guía
+        // 6-10 personas = 2 guías
+        // 11-15 personas = 3 guías, etc.
+        const numGuias = Math.ceil(numPersonas / 5);
 
         numeroGuiasInput.value = numGuias;
 
@@ -293,8 +335,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // ====== CÁLCULO DE TOTAL ======
 
     /**
-     * Calcular y actualizar el total
-     */
+  * Calcular y actualizar el total
+  */
     function calcularTotal() {
         const numPersonas = parseInt(numPersonasInput.value);
         const numGuias = parseInt(numeroGuiasInput.value);
@@ -305,13 +347,30 @@ document.addEventListener('DOMContentLoaded', function () {
         const totalMXN = subtotalEntradas + subtotalGuias;
         const totalUSD = totalMXN * tasaCambioUSD;
 
-        // Actualizar en la página
+        // Actualizar contador de personas
+        document.getElementById('contador-personas').textContent = `x${numPersonas}`;
+
+        // Actualizar subtotal de entradas
+        document.querySelector('.subtotal-entradas-mxn').textContent =
+            '$' + subtotalEntradas.toFixed(2) + ' mxn';
+        document.querySelector('.subtotal-entradas-usd').textContent =
+            '$' + (subtotalEntradas * tasaCambioUSD).toFixed(2) + ' USD';
+
+        // Actualizar contador de guías
+        document.getElementById('contador-guias').textContent = `x${numGuias}`;
+
+        // Actualizar subtotal de guías
+        document.querySelector('.subtotal-guias-mxn').textContent =
+            '$' + subtotalGuias.toFixed(2) + ' mxn';
+        document.querySelector('.subtotal-guias-usd').textContent =
+            '$' + (subtotalGuias * tasaCambioUSD).toFixed(2) + ' USD';
+
+        // Actualizar total
         document.querySelector('.total-mxn').textContent =
             '$' + totalMXN.toFixed(2) + ' mxn';
         document.querySelector('.total-usd').textContent =
             '$' + totalUSD.toFixed(2) + ' USD';
     }
-
     // ====== VALIDACIÓN Y ENVÍO DEL FORMULARIO ======
 
     /**
