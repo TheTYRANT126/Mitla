@@ -71,6 +71,94 @@ document.addEventListener('DOMContentLoaded', function () {
     heroCarousel.init();
 
 
+    // ===== ROTACIÓN AUTOMÁTICA DE FEATURES =====
+    const featureRotation = {
+        currentFeature: 0,
+        features: document.querySelectorAll('.feature-box'),
+        interval: null,
+        userInteracting: false,
+
+        init: function () {
+            if (this.features.length === 0) return;
+
+            // Configurar eventos de hover
+            this.features.forEach((feature, index) => {
+                feature.addEventListener('mouseenter', () => {
+                    this.onUserHover(index);
+                });
+
+                feature.addEventListener('mouseleave', () => {
+                    this.onUserLeave(index);
+                });
+            });
+
+            // Iniciar rotación automática
+            this.startAutoRotation();
+        },
+
+        goToFeature: function (index) {
+            // Remover clase active de feature actual
+            this.features[this.currentFeature].classList.remove('active');
+
+            // Actualizar índice
+            this.currentFeature = index;
+
+            // Agregar clase active al nuevo feature
+            this.features[this.currentFeature].classList.add('active');
+        },
+
+        nextFeature: function () {
+            const next = (this.currentFeature + 1) % this.features.length;
+            this.goToFeature(next);
+        },
+
+        onUserHover: function (index) {
+            // Usuario está interactuando
+            this.userInteracting = true;
+
+            // Pausar rotación automática
+            this.pauseAutoRotation();
+
+            // Activar el feature que el usuario seleccionó
+            this.goToFeature(index);
+        },
+
+        onUserLeave: function (index) {
+            // Usuario dejó de interactuar
+            this.userInteracting = false;
+
+            // Reiniciar rotación desde la siguiente feature
+            this.pauseAutoRotation();
+
+            // Esperar un momento antes de continuar
+            setTimeout(() => {
+                if (!this.userInteracting) {
+                    this.nextFeature();
+                    this.startAutoRotation();
+                }
+            }, 500); // Espera medio segundo antes de continuar
+        },
+
+        startAutoRotation: function () {
+            this.interval = setInterval(() => {
+                if (!this.userInteracting) {
+                    this.nextFeature();
+                }
+            }, 4000); // Cambia cada 4 segundos
+        },
+
+        pauseAutoRotation: function () {
+            if (this.interval) {
+                clearInterval(this.interval);
+                this.interval = null;
+            }
+        }
+    };
+
+    // Inicializar rotación de features
+    featureRotation.init();
+
+
     // ANIMACIÓN AL HACER SCROLL 
     const observerOptions = {
         threshold: 0.1,
@@ -147,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //  LOG DE DEBUG solo en desarrollo
     console.log('Mitla Tours - Sistema cargado correctamente');
     console.log('Slides encontrados:', heroCarousel.slides.length);
+    console.log('Features encontrados:', featureRotation.features.length);
 });
 
 

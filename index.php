@@ -307,7 +307,7 @@ $lang = getLanguage();
                 Todos los derechos reservados
             </p>
             <div class="mt-3">
-                <a href="/admin" class="text-white-50 small">Acceso Administrador</a>
+                <a href="/mitla-tours/admin/" class="text-white-50 small">Acceso Administrador</a>
             </div>
         </div>
     </footer>

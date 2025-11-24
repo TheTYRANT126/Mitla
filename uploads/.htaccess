@@ -1,0 +1,11 @@
+# Permitir acceso solo a archivos de imagen y PDF
+<FilesMatch "\.(jpg|jpeg|png|gif|pdf)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Denegar acceso a scripts PHP dentro de uploads
+<FilesMatch "\.php$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>

@@ -165,9 +165,10 @@ body {
     overflow: hidden;
 }
 
-.feature-box:hover {
+.feature-box:hover,
+.feature-box.active {
     background-color: #ffffff;
-    /* AJUSTABLE: Color de fondo al hover */
+    /* AJUSTABLE: Color de fondo al hover/active */
 }
 
 /* 
@@ -258,7 +259,8 @@ body {
     /* AJUSTABLE: Velocidad */
 }
 
-.feature-box:hover .clima-preview-image {
+.feature-box:hover .clima-preview-image,
+.feature-box.active .clima-preview-image {
     opacity: 1;
     transform: translateY(0);
 }
@@ -296,7 +298,8 @@ body {
     /* AJUSTABLE: Velocidad de aparición */
 }
 
-.feature-box:hover .phone-image {
+.feature-box:hover .phone-image,
+.feature-box.active .phone-image {
     opacity: 1;
 }
 
@@ -325,7 +328,8 @@ body {
     /* AJUSTABLE: Aparece después del teléfono */
 }
 
-.feature-box:hover .phone-text {
+.feature-box:hover .phone-text,
+.feature-box.active .phone-text {
     opacity: 1;
 }
 
@@ -397,18 +401,19 @@ body {
     /* AJUSTABLE: Desde cuánto abajo aparece */
 }
 
-/* 
+/*
  * ============================================
- * ESTADO HOVER - Posiciones finales
+ * ESTADO HOVER Y ACTIVE - Posiciones finales
  * ============================================
  */
 
-/* 
- * ÍCONO al hacer HOVER
+/*
+ * ÍCONO al hacer HOVER o cuando está ACTIVE
  * Posición final PowerPoint: horizontal 0.56cm, vertical 1.13cm
  * Tamaño final: 6.95cm ancho x 5.52cm alto
  */
-.feature-box:hover .feature-icon-wrapper {
+.feature-box:hover .feature-icon-wrapper,
+.feature-box.active .feature-icon-wrapper {
     /* Posición final - Esquina superior izquierda */
     top: 15px;
     /* AJUSTABLE: 1.13cm en PowerPoint ≈ 15px desde arriba */
@@ -418,12 +423,13 @@ body {
     /* AJUSTABLE: 0.83 = reducción del ícono (6.95/8.34) */
 }
 
-/* 
- * TÍTULO al hacer HOVER
+/*
+ * TÍTULO al hacer HOVER o cuando está ACTIVE
  * Posición final PowerPoint: horizontal 6.62cm, vertical 3.17cm
  * Se coloca a la derecha del ícono
  */
-.feature-box:hover .feature-title {
+.feature-box:hover .feature-title,
+.feature-box.active .feature-title {
     top: 25px;
     /* 25 AJUSTABLE: 3.17cm en PowerPoint ≈ 25-30px */
     left: 90px;
@@ -437,11 +443,12 @@ body {
     /* AJUSTABLE: Ancho máximo en estado hover */
 }
 
-/* 
- * DESCRIPCIÓN al hacer HOVER
+/*
+ * DESCRIPCIÓN al hacer HOVER o cuando está ACTIVE
  * Aparece con opacidad completa
  */
-.feature-box:hover .feature-description {
+.feature-box:hover .feature-description,
+.feature-box.active .feature-description {
     opacity: 1;
     transform: translateY(0);
     /* Se mueve a su posición final */

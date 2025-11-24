@@ -1,0 +1,31 @@
+
+# Habilitar rewrite engine
+RewriteEngine On
+RewriteBase /mitla-tours/
+
+# Proteger archivos sensibles
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Proteger config y classes
+<Files ~ "\.(php|inc)$">
+    <IfModule mod_rewrite.c>
+        RewriteEngine on
+        RewriteCond %{REQUEST_URI} ^.*/config/.*$
+        RewriteRule ^(.*)$ - [F,L]
+        
+        RewriteCond %{REQUEST_URI} ^.*/classes/.*$
+        RewriteRule ^(.*)$ - [F,L]
+    </IfModule>
+</Files>
+
+# Proteger logs
+RewriteRule ^logs/ - [F,L]
+
+# PHP settings
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value max_input_time 300
