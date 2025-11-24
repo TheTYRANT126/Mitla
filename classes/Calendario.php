@@ -31,15 +31,15 @@ class Calendario {
         
         // Obtener reservaciones del mes
         $reservaciones = $this->db->fetchAll(
-            "SELECT fecha_tour, hora_inicio, id_paquete, 
-                    SUM(numero_personas) as total_personas,
+            "SELECT r.fecha_tour, r.hora_inicio, r.id_paquete, 
+                    SUM(r.numero_personas) AS total_personas,
                     p.capacidad_maxima
              FROM reservaciones r
              INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
              WHERE r.fecha_tour BETWEEN ? AND ?
              AND r.estado IN ('confirmada', 'pagada', 'pendiente')
              " . ($idPaquete ? "AND r.id_paquete = ?" : "") . "
-             GROUP BY r.fecha_tour, r.hora_inicio, r.id_paquete",
+             GROUP BY r.fecha_tour, r.hora_inicio, r.id_paquete, p.capacidad_maxima",
             $idPaquete ? [$primerDia, $ultimoDia, $idPaquete] : [$primerDia, $ultimoDia]
         );
         

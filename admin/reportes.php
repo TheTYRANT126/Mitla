@@ -149,6 +149,9 @@ $pageTitle = 'Generación de Reportes';
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin/admin.css">
     
     <style>
+        body.admin-reportes-page {
+            background-color: #f8f9fa;
+        }
         .reporte-card {
             border: 2px solid #dee2e6;
             border-radius: 10px;
@@ -173,7 +176,7 @@ $pageTitle = 'Generación de Reportes';
         }
     </style>
 </head>
-<body>
+<body class="admin-reportes-page">
     <?php include __DIR__ . '/includes/header.php'; ?>
     
     <div class="container-fluid">
@@ -183,7 +186,7 @@ $pageTitle = 'Generación de Reportes';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-file-pdf"></i> Generación de Reportes
+                        Generación de Reportes
                     </h1>
                 </div>
                 
@@ -210,7 +213,7 @@ $pageTitle = 'Generación de Reportes';
                     <!-- Selección de Tipo de Reporte -->
                     <div class="card shadow mb-4">
                         <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="fas fa-list"></i> Seleccionar Tipo de Reporte</h5>
+                            <h5 class="mb-0">Seleccionar Tipo de Reporte</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -262,7 +265,7 @@ $pageTitle = 'Generación de Reportes';
                     <!-- Parámetros del Reporte -->
                     <div class="card shadow mb-4" id="parametros" style="display: none;">
                         <div class="card-header bg-secondary text-white">
-                            <h5 class="mb-0"><i class="fas fa-cog"></i> Parámetros del Reporte</h5>
+                            <h5 class="mb-0">Parámetros del Reporte</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -318,7 +321,7 @@ $pageTitle = 'Generación de Reportes';
                 <!-- Ayuda -->
                 <div class="card shadow mb-4">
                     <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-question-circle"></i> Ayuda</h5>
+                        <h5 class="mb-0">Ayuda</h5>
                     </div>
                     <div class="card-body">
                         <h6>Tipos de Reportes Disponibles:</h6>

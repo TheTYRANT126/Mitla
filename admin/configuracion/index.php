@@ -89,7 +89,7 @@ $pageTitle = 'Configuración del Sistema';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-cog"></i> Configuración del Sistema
+                        Configuración del Sistema
                     </h1>
                 </div>
                 
@@ -124,7 +124,7 @@ $pageTitle = 'Configuración del Sistema';
                             <!-- Configuración de Emails -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0"><i class="fas fa-envelope"></i> Configuración de Emails</h5>
+                                    <h5 class="mb-0">Configuración de Emails</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-check form-switch mb-3">
@@ -163,7 +163,7 @@ $pageTitle = 'Configuración del Sistema';
                             <!-- Configuración de Cancelaciones -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-warning">
-                                    <h5 class="mb-0"><i class="fas fa-times-circle"></i> Configuración de Cancelaciones</h5>
+                                    <h5 class="mb-0">Configuración de Cancelaciones</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-check form-switch mb-3">
@@ -202,7 +202,7 @@ $pageTitle = 'Configuración del Sistema';
                             <!-- Configuración del Sistema -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-danger text-white">
-                                    <h5 class="mb-0"><i class="fas fa-wrench"></i> Configuración del Sistema</h5>
+                                    <h5 class="mb-0">Configuración del Sistema</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-check form-switch mb-3">
@@ -221,7 +221,6 @@ $pageTitle = 'Configuración del Sistema';
                                     </div>
                                     
                                     <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle"></i>
                                         <strong>Atención:</strong> Al activar el modo mantenimiento, los clientes no podrán hacer nuevas reservaciones.
                                     </div>
                                 </div>
@@ -229,7 +228,7 @@ $pageTitle = 'Configuración del Sistema';
                             
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="fas fa-save"></i> Guardar Configuración
+                                    Guardar Configuración
                                 </button>
                             </div>
                         </form>
@@ -240,7 +239,7 @@ $pageTitle = 'Configuración del Sistema';
                         <!-- Información del Sistema -->
                         <div class="card shadow mb-4">
                             <div class="card-header bg-info text-white">
-                                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información del Sistema</h5>
+                                <h5 class="mb-0">Información del Sistema</h5>
                             </div>
                             <div class="card-body">
                                 <p class="mb-2">
@@ -288,20 +287,20 @@ $pageTitle = 'Configuración del Sistema';
                         <!-- Accesos Rápidos -->
                         <div class="card shadow mb-4">
                             <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0"><i class="fas fa-link"></i> Accesos Rápidos</h5>
+                                <h5 class="mb-0">Accesos Rápidos</h5>
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2">
                                     <a href="cambiar-password.php" class="btn btn-outline-primary">
-                                        <i class="fas fa-key"></i> Cambiar Contraseña
+                                        Cambiar Contraseña
                                     </a>
                                     
                                     <a href="../logs/" class="btn btn-outline-secondary">
-                                        <i class="fas fa-history"></i> Ver Logs
+                                        Ver Logs
                                     </a>
                                     
                                     <a href="../reportes.php" class="btn btn-outline-success">
-                                        <i class="fas fa-file-pdf"></i> Generar Reportes
+                                        Generar Reportes
                                     </a>
                                 </div>
                             </div>
@@ -310,7 +309,7 @@ $pageTitle = 'Configuración del Sistema';
                         <!-- Ayuda -->
                         <div class="card shadow">
                             <div class="card-header bg-dark text-white">
-                                <h5 class="mb-0"><i class="fas fa-question-circle"></i> Ayuda</h5>
+                                <h5 class="mb-0">Ayuda</h5>
                             </div>
                             <div class="card-body">
                                 <h6>Configuraciones Importantes:</h6>

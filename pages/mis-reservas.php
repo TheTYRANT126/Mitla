@@ -126,6 +126,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['codigo_reservacion'])
                     <li class="nav-item">
                         <a class="nav-link active" href="<?php echo SITE_URL; ?>/pages/mis-reservas.php">Mis Reservas</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-globe"></i>
+                            <?php 
+                                $langs = ['es' => 'ES', 'en' => 'EN', 'fr' => 'FR'];
+                                echo $langs[$lang];
+                            ?>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?lang=es">🇲🇽 Español</a></li>
+                            <li><a class="dropdown-item" href="?lang=en">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item" href="?lang=fr">🇫🇷 Français</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -1,3 +1,45 @@
+/* ===== Header styles (matching public site) ===== */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+}
+
+.navbar-logo {
+    height: 40px;
+    max-width: 200px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.05);
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.navbar-nav .nav-item {
+    margin-left: 15px;
+}
+
+.navbar-nav .nav-link {
+    transition: color 0.3s ease;
+    font-size: 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--admin-primary);
+}
+
+.navbar-nav .nav-link.text-danger:hover {
+    color: #a02a2a !important;
+}
+
 :root {
     --admin-primary: #0066cc;
     --admin-secondary: #6c757d;
@@ -8,7 +50,10 @@
 }
 
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: .875rem;
+    line-height: 1.6;
+    color: #333;
 }
 
 .feather {
@@ -78,13 +123,13 @@ body {
 
 /* Main content */
 main {
-    padding-top: 56px;
+    padding-top: 90px;
 }
 
 /* Responsive */
 @media (max-width: 767.98px) {
     .sidebar {
-        top: 56px;
+        top: 90px;
     }
 }
 

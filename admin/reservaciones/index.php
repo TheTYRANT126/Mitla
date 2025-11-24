@@ -25,7 +25,7 @@ $reservaciones = $reservacionClass->obtenerTodas($filtros);
 
 // Obtener paquetes para el filtro
 $db = Database::getInstance()->getConnection();
-$stmt = $db->query("SELECT id_paquete, nombre FROM paquetes ORDER BY nombre");
+$stmt = $db->query("SELECT id_paquete, nombre_paquete AS nombre FROM paquetes ORDER BY nombre_paquete");
 $paquetes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = 'Gestión de Reservaciones';
@@ -61,7 +61,7 @@ $pageTitle = 'Gestión de Reservaciones';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-calendar-check"></i> Gestión de Reservaciones
+                        Gestión de Reservaciones
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosCollapse">

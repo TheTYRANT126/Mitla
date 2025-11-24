@@ -25,7 +25,7 @@ if ($year < 2020 || $year > 2030) {
 
 // Obtener paquetes
 $db = Database::getInstance()->getConnection();
-$stmt = $db->query("SELECT id_paquete, nombre FROM paquetes WHERE activo = 1 ORDER BY nombre");
+$stmt = $db->query("SELECT id_paquete, nombre_paquete AS nombre FROM paquetes WHERE activo = 1 ORDER BY nombre_paquete");
 $paquetes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $idPaqueteSeleccionado = intval($_GET['id_paquete'] ?? ($paquetes[0]['id_paquete'] ?? 0));
@@ -126,7 +126,7 @@ $pageTitle = 'Calendario de Disponibilidad';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-calendar-alt"></i> Calendario de Disponibilidad
+                        Calendario de Disponibilidad
                     </h1>
                 </div>
                 

@@ -122,14 +122,14 @@ $userRole = $_SESSION['user_role'] ?? 'guia';
     bottom: 0;
     left: 0;
     z-index: 100;
-    padding: 48px 0 0;
+    padding: 80px 0 0;
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
 
 .sidebar-sticky {
     position: relative;
     top: 0;
-    height: calc(100vh - 48px);
+    height: calc(100vh - 80px);
     padding-top: .5rem;
     overflow-x: hidden;
     overflow-y: auto;
@@ -166,7 +166,7 @@ $userRole = $_SESSION['user_role'] ?? 'guia';
 
 @media (max-width: 767.98px) {
     .sidebar {
-        top: 56px;
+        top: 90px;
     }
 }
 </style>

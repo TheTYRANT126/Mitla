@@ -32,7 +32,7 @@ $lang = getLanguage();
     <!-- Navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="/index.php">
+            <a class="navbar-brand" href="<?php echo SITE_URL; ?>">
                 <?php 
                 $logoPath = ASSETS_PATH . '/img/logo.png';
                 if (file_exists($logoPath)): 
@@ -50,19 +50,19 @@ $lang = getLanguage();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/">Inicio</a>
+                        <a class="nav-link active" href="<?php echo SITE_URL; ?>">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/pages/paquetes.php">Paquetes</a>
+                        <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/paquetes.php">Paquetes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/pages/mis-reservas.php">Mis Reservas</a>
+                        <a class="nav-link" href="<?php echo SITE_URL; ?>/pages/mis-reservas.php">Mis Reservas</a>
                     </li>
                     
                     <!-- Selector de idioma -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-globe"></i> 
+                            <i class="fa-solid fa-globe"></i> 
                             <?php 
                                 $langs = ['es' => 'ES', 'en' => 'EN', 'fr' => 'FR'];
                                 echo $langs[$lang];
@@ -100,7 +100,7 @@ $lang = getLanguage();
                     <p class="lead mb-4 animate-fade-in-delay">
                         Vive una experiencia única con guías certificados
                     </p>
-                    <a href="pages/paquetes.php" class="btn btn-primary btn-lg animate-fade-in-delay-2">
+                    <a href="<?php echo SITE_URL; ?>/pages/paquetes.php" class="btn btn-primary btn-lg animate-fade-in-delay-2">
                         <i class="fas fa-calendar-check"></i> Reservar Ahora
                     </a>
                 </div>
@@ -249,7 +249,7 @@ $lang = getLanguage();
             <div class="text-center mt-4">
                 <!-- 
                 BOTÓN "TODOS LOS PAQUETES" COMENTADO PARA FUTURO USO
-                <a href="/pages/paquetes.php" class="btn btn-outline-primary btn-lg">
+                <a href="<?php echo SITE_URL; ?>/pages/paquetes.php" class="btn btn-outline-primary btn-lg">
                     <?php echo t('home.view_all_packages'); ?>
                 </a>
                 -->

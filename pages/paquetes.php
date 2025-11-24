@@ -79,7 +79,7 @@ $horarios = $db->fetchAll(
                     <!-- Selector de idioma -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-globe"></i> 
+                            <i class="fa-solid fa-globe"></i> 
                             <?php 
                                 $langs = ['es' => 'ES', 'en' => 'EN', 'fr' => 'FR'];
                                 echo $langs[$lang];

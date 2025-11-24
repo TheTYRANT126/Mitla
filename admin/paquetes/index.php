@@ -18,7 +18,7 @@ $stmt = $db->query("
            (SELECT COUNT(*) FROM reservaciones r WHERE r.id_paquete = p.id_paquete) as total_reservaciones,
            (SELECT COUNT(*) FROM horarios h WHERE h.id_paquete = p.id_paquete) as total_horarios
     FROM paquetes p
-    ORDER BY p.orden, p.nombre
+    ORDER BY p.nombre_paquete
 ");
 $paquetes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -68,7 +68,7 @@ $pageTitle = 'Gestión de Paquetes';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-box"></i> Gestión de Paquetes
+                        Gestión de Paquetes
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <a href="crear.php" class="btn btn-primary">
