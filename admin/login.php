@@ -4,6 +4,12 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../classes/Auth.php';
 
+// Headers para prevenir caché de la página de login
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
 $auth = new Auth();
 
 // Si ya está logueado, redirigir
@@ -50,7 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('<?php echo ASSETS_URL; ?>/img/Fondo Mitla.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -69,9 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .login-header {
-            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
-            color: white;
-            padding: 40px 30px;
+            background: rgba(253, 253, 253, 0.86);
+            color: #0056b3;
+            padding: 30px 30px 20px;
             text-align: center;
         }
         
@@ -84,6 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .login-header p {
             margin: 10px 0 0;
             opacity: 0.9;
+        }
+
+        .login-logo {
+            max-width: 150px;
+            margin-top: 10px;
         }
         
         .login-body {
@@ -150,9 +165,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-container">
         <div class="login-header">
-            <i class="fas fa-shield-alt fa-3x mb-3"></i>
             <h1>Panel Administrativo</h1>
-            <p>Mitla Tours</p>
+            <img src="<?php echo ASSETS_URL; ?>/img/logo.png" alt="Logo <?php echo SITE_NAME; ?>" class="login-logo">
         </div>
         
         <div class="login-body">
@@ -176,7 +190,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                class="form-control" 
                                id="email" 
                                name="email" 
-                               placeholder="admin@mitlatours.com"
                                required 
                                autofocus>
                     </div>
@@ -192,7 +205,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                class="form-control" 
                                id="password" 
                                name="password" 
-                               placeholder="••••••••"
                                required>
                     </div>
                 </div>
@@ -208,13 +220,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
             
-            <?php if (DEBUG_MODE): ?>
-                <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 10px; font-size: 0.85rem;">
-                    <strong>Credenciales de prueba:</strong><br>
-                    Email: admin@mitlatours.com<br>
-                    Password: Admin2025!
-                </div>
-            <?php endif; ?>
         </div>
     </div>
     

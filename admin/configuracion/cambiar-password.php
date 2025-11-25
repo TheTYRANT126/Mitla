@@ -120,7 +120,7 @@ $pageTitle = 'Cambiar Contraseña';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-key"></i> Cambiar Contraseña
+                        Cambiar Contraseña
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <a href="index.php" class="btn btn-outline-secondary">
@@ -145,7 +145,7 @@ $pageTitle = 'Cambiar Contraseña';
                     <div class="col-md-8">
                         <div class="card shadow">
                             <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Actualizar Contraseña</h5>
+                                <h5 class="mb-0">Actualizar Contraseña</h5>
                             </div>
                             <div class="card-body">
                                 <form method="POST" id="formPassword">
@@ -225,7 +225,7 @@ $pageTitle = 'Cambiar Contraseña';
                                     </div>
                                     
                                     <div class="alert alert-info">
-                                        <h6><i class="fas fa-info-circle"></i> Requisitos de Contraseña:</h6>
+                                        <h6>Requisitos de Contraseña:</h6>
                                         <ul class="mb-0" id="requisitos">
                                             <li id="req-length">Mínimo 8 caracteres</li>
                                             <li id="req-uppercase">Al menos una letra mayúscula</li>
@@ -235,36 +235,18 @@ $pageTitle = 'Cambiar Contraseña';
                                     </div>
                                     
                                     <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle"></i>
                                         <strong>Importante:</strong> Después de cambiar tu contraseña, tendrás que iniciar sesión nuevamente.
                                     </div>
                                     
                                     <div class="d-grid gap-2">
                                         <button type="submit" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-save"></i> Cambiar Contraseña
+                                            Cambiar Contraseña
                                         </button>
                                         <a href="index.php" class="btn btn-outline-secondary btn-lg">
                                             <i class="fas fa-times"></i> Cancelar
                                         </a>
                                     </div>
                                 </form>
-                            </div>
-                        </div>
-                        
-                        <!-- Consejos de Seguridad -->
-                        <div class="card shadow mt-4">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Consejos de Seguridad</h5>
-                            </div>
-                            <div class="card-body">
-                                <ul>
-                                    <li>Use una combinación de letras mayúsculas, minúsculas, números y símbolos</li>
-                                    <li>No use información personal (nombres, fechas de nacimiento, etc.)</li>
-                                    <li>No reutilice contraseñas de otras cuentas</li>
-                                    <li>Cambie su contraseña periódicamente</li>
-                                    <li>No comparta su contraseña con nadie</li>
-                                    <li>Use un administrador de contraseñas para mayor seguridad</li>
-                                </ul>
                             </div>
                         </div>
                     </div>

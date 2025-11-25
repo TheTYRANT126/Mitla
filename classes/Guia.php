@@ -307,24 +307,34 @@ class Guia {
         $guiasDisponibles = $this->db->fetchAll(
             "SELECT g.*, 
                     GROUP_CONCAT(DISTINCT gi.idioma) as idiomas,
-                    CASE WHEN gi.idioma = ? THEN 1 ELSE 0 END as habla_idioma_requerido
+                    CASE WHEN gi.idioma = ? THEN 1 ELSE 0 END as habla_idioma_requerido,
+                    CASE 
+                        WHEN EXISTS (
+                            SELECT 1 
+                            FROM asignacion_guias ag2
+                            INNER JOIN reservaciones r2 ON ag2.id_reservacion = r2.id_reservacion
+                            WHERE ag2.id_guia = g.id_guia
+                            AND r2.fecha_tour = ?
+                            AND r2.hora_inicio = ?
+                            AND r2.estado IN ('confirmada','pagada')
+                        ) THEN 0
+                        ELSE 1
+                    END AS disponible,
+                    CASE WHEN EXISTS (
+                        SELECT 1
+                        FROM guia_idiomas gi2
+                        WHERE gi2.id_guia = g.id_guia
+                        AND gi2.idioma = ?
+                    ) THEN 1 ELSE 0 END AS preferido
              FROM guias g
              INNER JOIN usuarios u ON g.id_usuario = u.id_usuario
              LEFT JOIN guia_idiomas gi ON g.id_guia = gi.id_guia
              WHERE g.activo = 1 
              AND u.activo = 1
-             AND g.id_guia NOT IN (
-                 SELECT ag.id_guia 
-                 FROM asignacion_guias ag
-                 INNER JOIN reservaciones r ON ag.id_reservacion = r.id_reservacion
-                 WHERE r.fecha_tour = ?
-                 AND r.hora_inicio = ?
-                 AND r.estado IN ('confirmada', 'pagada')
-             )
              GROUP BY g.id_guia
-             ORDER BY habla_idioma_requerido DESC, g.nombre_completo
+             ORDER BY preferido DESC, disponible DESC, g.nombre_completo
              LIMIT ?",
-            [$idioma, $fecha, $horaInicio, $numGuiasRequeridos * 2] // Traer el doble por si acaso
+            [$idioma, $fecha, $horaInicio, $idioma, $numGuiasRequeridos * 2]
         );
         
         return $guiasDisponibles;

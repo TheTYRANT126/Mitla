@@ -34,7 +34,7 @@ if (empty($idGuias)) {
 
 try {
     $reservacionClass = new ReservacionAdmin();
-    $resultado = $reservacionClass->asignarGuias($idReservacion, $idGuias);
+    $resultado = $reservacionClass->asignarGuias($idReservacion, $idGuias, $auth->getUserId());
     
     if ($resultado) {
         echo json_encode([

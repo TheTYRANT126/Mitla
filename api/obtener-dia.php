@@ -1,9 +1,9 @@
 <?php
 
 
-require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../classes/Auth.php';
-require_once __DIR__ . '/../../classes/Calendario.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../classes/Auth.php';
+require_once __DIR__ . '/../classes/Calendario.php';
 
 header('Content-Type: application/json');
 

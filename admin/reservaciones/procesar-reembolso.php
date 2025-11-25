@@ -23,8 +23,8 @@ $db = Database::getInstance()->getConnection();
 // Obtener información de la reservación
 $stmt = $db->prepare("
     SELECT r.*, 
-           c.nombre as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono,
-           p.nombre as paquete_nombre
+           c.nombre_completo as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono,
+           p.nombre_paquete as paquete_nombre
     FROM reservaciones r
     INNER JOIN clientes c ON r.id_cliente = c.id_cliente
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete

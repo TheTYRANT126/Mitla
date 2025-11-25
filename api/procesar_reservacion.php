@@ -80,26 +80,11 @@ try {
     
     try {
   
-        $cliente = $db->fetchOne(
-            "SELECT id_cliente FROM clientes WHERE email = ?",
-            [$email]
+        // Cada reservación genera un cliente independiente para evitar sobrescribir nombres o datos previos
+        $id_cliente = $db->insert(
+            "INSERT INTO clientes (nombre_completo, email, idioma_preferido) VALUES (?, ?, ?)",
+            [$nombre_completo, $email, $idioma]
         );
-        
-        if ($cliente) {
-            $id_cliente = $cliente['id_cliente'];
-            
-   
-            $db->execute(
-                "UPDATE clientes SET nombre_completo = ?, idioma_preferido = ? WHERE id_cliente = ?",
-                [$nombre_completo, $idioma, $id_cliente]
-            );
-        } else {
- 
-            $id_cliente = $db->insert(
-                "INSERT INTO clientes (nombre_completo, email, idioma_preferido) VALUES (?, ?, ?)",
-                [$nombre_completo, $email, $idioma]
-            );
-        }
         
 
         $codigo_reservacion = generarCodigoReservacion();

@@ -11,10 +11,10 @@ class Calendario {
      * Obtener disponibilidad de un mes específico
      */
     public function obtenerMes($year, $month, $idPaquete = null) {
-        $primerDia = "$year-$month-01";
-        $ultimoDia = date("Y-m-t", strtotime($primerDia));
+        $primerDia = sprintf('%04d-%02d-01', (int)$year, (int)$month);
+        $ultimoDia = date('Y-m-t', strtotime($primerDia));
         
-        // Obtener días desactivados
+        // Obtener días/horarios desactivados y agruparlos por fecha
         $sql = "SELECT fecha, hora_inicio, hora_fin, motivo
                 FROM disponibilidad_calendario
                 WHERE fecha BETWEEN ? AND ?
@@ -27,10 +27,17 @@ class Calendario {
             $params[] = $idPaquete;
         }
         
-        $diasDesactivados = $this->db->fetchAll($sql, $params);
+        $diasDesactivados = [];
+        foreach ($this->db->fetchAll($sql, $params) as $registro) {
+            $fecha = $registro['fecha'];
+            if (!isset($diasDesactivados[$fecha])) {
+                $diasDesactivados[$fecha] = [];
+            }
+            $diasDesactivados[$fecha][] = $registro;
+        }
         
-        // Obtener reservaciones del mes
-        $reservaciones = $this->db->fetchAll(
+        // Obtener reservaciones del mes y agruparlas por día
+        $reservasQuery = $this->db->fetchAll(
             "SELECT r.fecha_tour, r.hora_inicio, r.id_paquete, 
                     SUM(r.numero_personas) AS total_personas,
                     p.capacidad_maxima
@@ -43,9 +50,18 @@ class Calendario {
             $idPaquete ? [$primerDia, $ultimoDia, $idPaquete] : [$primerDia, $ultimoDia]
         );
         
+        $reservacionesPorDia = [];
+        foreach ($reservasQuery as $reserva) {
+            $fecha = $reserva['fecha_tour'];
+            if (!isset($reservacionesPorDia[$fecha])) {
+                $reservacionesPorDia[$fecha] = [];
+            }
+            $reservacionesPorDia[$fecha][] = $reserva;
+        }
+        
         return [
             'dias_desactivados' => $diasDesactivados,
-            'reservaciones' => $reservaciones
+            'reservaciones' => $reservacionesPorDia
         ];
     }
     

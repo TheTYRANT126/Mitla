@@ -90,33 +90,63 @@ $pageTitle = 'Gestión de Paquetes';
                 
                 <!-- Paquetes en Cards -->
                 <div class="row">
-                    <?php foreach ($paquetes as $paquete): ?>
+                    <?php foreach ($paquetes as $paquete): 
+                        $nombrePaquete = $paquete['nombre'] 
+                            ?? $paquete['nombre_paquete'] 
+                            ?? 'Sin nombre';
+                        $descripcion = $paquete['descripcion'] 
+                            ?? $paquete['descripcion_es'] 
+                            ?? '';
+                        $precioBase = isset($paquete['precio_base'])
+                            ? (float) $paquete['precio_base']
+                            : ((isset($paquete['precio_guia']) ? (float) $paquete['precio_guia'] : 0)
+                               + (isset($paquete['precio_entrada_persona']) ? (float) $paquete['precio_entrada_persona'] : 0));
+                        $duracionMin = isset($paquete['duracion'])
+                            ? (int) $paquete['duracion']
+                            : (isset($paquete['duracion_horas']) ? (int) round(((float) $paquete['duracion_horas']) * 60) : 0);
+                        $capacidadMax = $paquete['max_personas'] 
+                            ?? $paquete['capacidad_maxima'] 
+                            ?? 0;
+                        $candidatosImagen = [];
+                        if (!empty($paquete['imagen_banner'])) {
+                            $candidatosImagen[] = $paquete['imagen_banner'];
+                        }
+                        if (!empty($paquete['imagen'])) {
+                            $candidatosImagen[] = $paquete['imagen'];
+                        }
+                        $imagenPrincipal = getPackageCoverImageUrl(
+                            $paquete['id_paquete'] ?? 0,
+                            $candidatosImagen
+                        ) ?? ASSETS_URL . '/img/packages/default.jpg';
+                    ?>
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card paquete-card shadow position-relative">
-                            <?php if ($paquete['imagen_banner']): ?>
-                                <img src="<?php echo ASSETS_URL; ?>/img/packages/<?php echo $paquete['imagen_banner']; ?>" 
-                                     class="paquete-imagen"
-                                     alt="<?php echo htmlspecialchars($paquete['nombre']); ?>">
-                            <?php else: ?>
-                                <div class="paquete-imagen bg-secondary d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-image fa-4x text-white"></i>
-                                </div>
-                            <?php endif; ?>
+                            <img src="<?php echo htmlspecialchars($imagenPrincipal, ENT_QUOTES, 'UTF-8'); ?>" 
+                                 class="paquete-imagen"
+                                 alt="<?php echo htmlspecialchars($nombrePaquete); ?>">
                             
                             <span class="badge bg-success precio-badge">
-                                $<?php echo number_format($paquete['precio_base'], 2); ?>
+                                $<?php echo number_format($precioBase, 2); ?>
                             </span>
                             
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <?php echo htmlspecialchars($paquete['nombre']); ?>
+                                    <?php echo htmlspecialchars($nombrePaquete); ?>
                                     <?php if (!$paquete['activo']): ?>
                                         <span class="badge bg-danger ms-2">Inactivo</span>
                                     <?php endif; ?>
                                 </h5>
                                 
                                 <p class="card-text text-muted">
-                                    <?php echo substr(strip_tags($paquete['descripcion']), 0, 100); ?>...
+                                    <?php
+                                        $resumenDescripcion = strip_tags($descripcion);
+                                        if (function_exists('mb_substr')) {
+                                            $resumenDescripcion = mb_substr($resumenDescripcion, 0, 100, 'UTF-8');
+                                        } else {
+                                            $resumenDescripcion = substr($resumenDescripcion, 0, 100);
+                                        }
+                                        echo htmlspecialchars($resumenDescripcion, ENT_QUOTES, 'UTF-8');
+                                    ?>...
                                 </p>
                                 
                                 <hr>
@@ -124,11 +154,11 @@ $pageTitle = 'Gestión de Paquetes';
                                 <div class="row text-center small mb-3">
                                     <div class="col-4">
                                         <i class="fas fa-clock text-primary"></i><br>
-                                        <strong><?php echo $paquete['duracion']; ?></strong> min
+                                        <strong><?php echo $duracionMin; ?></strong> min
                                     </div>
                                     <div class="col-4">
                                         <i class="fas fa-users text-success"></i><br>
-                                        <strong><?php echo $paquete['max_personas']; ?></strong> max
+                                        <strong><?php echo $capacidadMax; ?></strong> max
                                     </div>
                                     <div class="col-4">
                                         <i class="fas fa-calendar-check text-info"></i><br>
@@ -179,11 +209,12 @@ $pageTitle = 'Gestión de Paquetes';
             return;
         }
         
-        fetch('<?php echo SITE_URL; ?>/api/admin/toggle-paquete.php', {
+        fetch('../../api/admin/toggle-paquete.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 id_paquete: idPaquete,
                 activo: nuevoEstado

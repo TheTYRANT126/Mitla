@@ -49,6 +49,54 @@ $pageTitle = 'Gestión de Reservaciones';
             padding: 20px;
             margin-bottom: 20px;
         }
+
+        /* Estilos personalizados para las tarjetas de estadísticas */
+        .card.border-left-warning,
+        .card.border-left-info,
+        .card.border-left-success,
+        .card.border-left-danger {
+            border: 2px solid !important;
+            border-left-width: 4px !important;
+        }
+
+        .card.border-left-warning {
+            border-color: #f6c23e !important;
+        }
+
+        .card.border-left-info {
+            border-color: #36b9cc !important;
+        }
+
+        .card.border-left-success {
+            border-color: #1cc88a !important;
+        }
+
+        .card.border-left-danger {
+            border-color: #e74a3b !important;
+        }
+
+        /* Asegurar que los textos sean negros */
+        .text-gray-800,
+        .card-body .h5 {
+            color: #000000 !important;
+        }
+
+        /* Títulos de las tarjetas en negro */
+        .card-body .text-warning,
+        .card-body .text-info,
+        .card-body .text-success,
+        .card-body .text-danger {
+            color: #000000 !important;
+        }
+
+        .text-xs {
+            font-weight: bold;
+        }
+
+        /* Iconos en gris claro */
+        .text-gray-300 {
+            color: #dddfeb !important;
+        }
     </style>
 </head>
 <body>
@@ -134,17 +182,20 @@ $pageTitle = 'Gestión de Reservaciones';
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search"></i> Buscar
+                                        Buscar
                                     </button>
                                     <a href="index.php" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times"></i> Limpiar
+                                        Limpiar
                                     </a>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-                
+
+                <!-- Separador -->
+                <div class="border-bottom mb-3"></div>
+
                 <!-- Estadísticas Rápidas -->
                 <div class="row mb-4">
                     <div class="col-md-3">
@@ -333,11 +384,35 @@ $pageTitle = 'Gestión de Reservaciones';
     $(document).ready(function() {
         $('#reservacionesTable').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-MX.json'
+                "decimal": "",
+                "emptyTable": "No hay datos disponibles en la tabla",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "No se encontraron registros coincidentes",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": activar para ordenar la columna ascendente",
+                    "sortDescending": ": activar para ordenar la columna descendente"
+                }
             },
             order: [[3, 'desc'], [4, 'desc']], // Ordenar por fecha y hora descendente
             pageLength: 25
         });
+
+        // Ayuda visual para indicar qué se puede escribir en el cuadro de búsqueda
+        $('.dataTables_filter input[type="search"]').attr('placeholder', 'Código o Nombre');
     });
     </script>
 </body>

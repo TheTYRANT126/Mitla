@@ -22,11 +22,6 @@ class Reporte {
             'por_mes' => $this->obtenerVentasPorMes($fechaInicio, $fechaFin),
             'tendencias' => $this->obtenerTendencias($fechaInicio, $fechaFin)
         ];
-        
-        if ($formato === 'pdf') {
-            return $this->generarPDFVentas($datos);
-        }
-        
         return $datos;
     }
     
@@ -201,6 +196,7 @@ class Reporte {
             "SELECT 
                 c.nombre_completo,
                 c.email,
+                c.telefono,
                 c.idioma_preferido,
                 COUNT(r.id_reservacion) as total_reservaciones,
                 SUM(r.numero_personas) as total_personas,
@@ -248,6 +244,14 @@ class Reporte {
      */
     public function exportarCSV($datos, $nombreArchivo, $encabezados = []) {
         $csv = fopen('php://temp', 'r+');
+        // Añadir BOM para que Excel detecte UTF-8 correctamente
+        fwrite($csv, "\xEF\xBB\xBF");
+        
+        // Asegurar extensión .csv
+        $extension = strtolower(pathinfo($nombreArchivo, PATHINFO_EXTENSION));
+        if ($extension !== 'csv') {
+            $nombreArchivo .= '.csv';
+        }
         
         // Escribir encabezados
         if (!empty($encabezados)) {
@@ -266,7 +270,11 @@ class Reporte {
         fclose($csv);
         
         // Guardar en archivo
-        $rutaArchivo = UPLOADS_PATH . '/reportes/' . $nombreArchivo;
+        $directorioReportes = UPLOADS_PATH . '/reportes';
+        if (!is_dir($directorioReportes)) {
+            mkdir($directorioReportes, 0775, true);
+        }
+        $rutaArchivo = $directorioReportes . '/' . $nombreArchivo;
         file_put_contents($rutaArchivo, $output);
         
         return [

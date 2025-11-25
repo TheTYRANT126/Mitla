@@ -50,15 +50,19 @@ $estadisticas = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Próximos tours
 $stmt = $db->prepare("
-    SELECT r.*, p.nombre as paquete_nombre, c.nombre as cliente_nombre, c.email as cliente_email
+    SELECT r.*, 
+           r.fecha_tour as fecha_reservacion,
+           p.nombre_paquete as paquete_nombre, 
+           c.nombre_completo as cliente_nombre, 
+           c.email as cliente_email
     FROM asignacion_guias ag
     INNER JOIN reservaciones r ON ag.id_reservacion = r.id_reservacion
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
     INNER JOIN clientes c ON r.id_cliente = c.id_cliente
     WHERE ag.id_guia = ? 
-      AND r.fecha_reservacion >= CURDATE()
+      AND r.fecha_tour >= CURDATE()
       AND r.estado IN ('confirmada', 'pagada')
-    ORDER BY r.fecha_reservacion ASC, r.hora_inicio ASC
+    ORDER BY r.fecha_tour ASC, r.hora_inicio ASC
     LIMIT 10
 ");
 $stmt->execute([$idGuia]);
@@ -66,13 +70,16 @@ $proximosTours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Historial de tours completados (últimos 20)
 $stmt = $db->prepare("
-    SELECT r.*, p.nombre as paquete_nombre, c.nombre as cliente_nombre
+    SELECT r.*, 
+           r.fecha_tour as fecha_reservacion,
+           p.nombre_paquete as paquete_nombre, 
+           c.nombre_completo as cliente_nombre
     FROM asignacion_guias ag
     INNER JOIN reservaciones r ON ag.id_reservacion = r.id_reservacion
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
     INNER JOIN clientes c ON r.id_cliente = c.id_cliente
     WHERE ag.id_guia = ? AND r.estado = 'completada'
-    ORDER BY r.fecha_reservacion DESC, r.hora_inicio DESC
+    ORDER BY r.fecha_tour DESC, r.hora_inicio DESC
     LIMIT 20
 ");
 $stmt->execute([$idGuia]);
@@ -80,7 +87,7 @@ $historialTours = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Observaciones del guía
 $stmt = $db->prepare("
-    SELECT og.*, r.codigo_reservacion, p.nombre as paquete_nombre, r.fecha_reservacion
+    SELECT og.*, r.codigo_reservacion, p.nombre_paquete as paquete_nombre, r.fecha_tour as fecha_reservacion
     FROM observaciones_guia og
     INNER JOIN reservaciones r ON og.id_reservacion = r.id_reservacion
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
@@ -144,6 +151,13 @@ $pageTitle = 'Detalle del Guía';
             margin-bottom: 15px;
             border-radius: 5px;
         }
+        .guia-info p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .guia-info span {
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -156,7 +170,7 @@ $pageTitle = 'Detalle del Guía';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-user-tie"></i> Detalle del Guía
+                        Detalle del Guía
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <a href="editar.php?id=<?php echo $idGuia; ?>" class="btn btn-primary me-2">
@@ -208,38 +222,36 @@ $pageTitle = 'Detalle del Guía';
                                     <span class="badge bg-danger mb-3">Inactivo</span>
                                 <?php endif; ?>
                                 
-                                <div class="text-start mt-3">
-                                    <p class="mb-2">
+                                <div class="text-start mt-3 guia-info">
+                                    <p class="mb-3">
                                         <i class="fas fa-envelope text-primary"></i>
                                         <strong>Email:</strong><br>
-                                        <small><?php echo htmlspecialchars($guia['email']); ?></small>
+                                        <span class="text-wrap d-inline-block"><?php echo htmlspecialchars($guia['email']); ?></span>
                                     </p>
-                                    <p class="mb-2">
+                                    <p class="mb-3">
                                         <i class="fas fa-phone text-success"></i>
                                         <strong>Teléfono:</strong><br>
-                                        <small><?php echo htmlspecialchars($guia['telefono']); ?></small>
+                                        <span class="text-wrap d-inline-block"><?php echo htmlspecialchars($guia['telefono']); ?></span>
                                     </p>
-                                    <p class="mb-2">
+                                    <p class="mb-3">
                                         <i class="fas fa-birthday-cake text-info"></i>
                                         <strong>Fecha de Nacimiento:</strong><br>
-                                        <small><?php echo date('d/m/Y', strtotime($guia['fecha_nacimiento'])); ?></small>
+                                        <span><?php echo date('d/m/Y', strtotime($guia['fecha_nacimiento'])); ?></span>
                                     </p>
-                                    <p class="mb-2">
+                                    <p class="mb-3">
                                         <i class="fas fa-id-card text-warning"></i>
                                         <strong>CURP:</strong><br>
-                                        <small><?php echo htmlspecialchars($guia['curp']); ?></small>
+                                        <span><?php echo htmlspecialchars($guia['curp']); ?></span>
                                     </p>
-                                    <p class="mb-2">
+                                    <p class="mb-3">
                                         <i class="fas fa-home text-secondary"></i>
                                         <strong>Domicilio:</strong><br>
-                                        <small><?php echo nl2br(htmlspecialchars($guia['domicilio'])); ?></small>
+                                        <span><?php echo nl2br(htmlspecialchars($guia['domicilio'])); ?></span>
                                     </p>
                                     <p class="mb-0">
                                         <i class="fas fa-language text-danger"></i>
                                         <strong>Idiomas:</strong><br>
-                                        <?php foreach ($guia['idiomas'] as $idioma): ?>
-                                            <span class="badge bg-info me-1"><?php echo ucfirst($idioma['idioma']); ?></span>
-                                        <?php endforeach; ?>
+                                        <span class="fw-medium"><?php echo implode(' ', array_map(fn($idioma) => ucfirst($idioma['idioma']), $guia['idiomas'])); ?></span>
                                     </p>
                                 </div>
                             </div>
@@ -269,7 +281,7 @@ $pageTitle = 'Detalle del Guía';
                         <div class="card shadow mb-4">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-calendar-day"></i> Próximos Tours (<?php echo count($proximosTours); ?>)
+                                    Próximos Tours (<?php echo count($proximosTours); ?>)
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -314,7 +326,7 @@ $pageTitle = 'Detalle del Guía';
                         <div class="card shadow mb-4">
                             <div class="card-header bg-warning">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-comment-dots"></i> Comentarios del Administrador
+                                    Comentarios del Administrador
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -394,7 +406,7 @@ $pageTitle = 'Detalle del Guía';
                 <div class="card shadow mb-4">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-history"></i> Historial de Tours Completados
+                            Historial de Tours Completados
                         </h5>
                     </div>
                     <div class="card-body">

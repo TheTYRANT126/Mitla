@@ -269,7 +269,7 @@ $lang = getLanguage();
             
             <div class="info-content">
                 <div class="row align-items-center">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <h3 class="text-white mb-3">
                             Conoce más sobre Mitla
                         </h3>
@@ -277,18 +277,16 @@ $lang = getLanguage();
                             <?php echo t('home.info_section_title') . ' ' . t('home.info_section_desc'); ?>
                         </p>
                     </div>
-                    <div class="col-md-4 text-center">
-                        <a href="https://es.wikipedia.org/wiki/San_Pablo_Villa_de_Mitla" 
-                           target="_blank" 
-                           class="wiki-icon-link">
-                            <div class="wiki-icon-wrapper">
-                                <i class="fas fa-info-circle fa-5x text-white info-icon"></i>
-                                <img src="<?php echo ASSETS_URL; ?>/img/info/wikipedia-logo.png" 
-                                     alt="Wikipedia" 
-                                     class="wikipedia-icon">
-                            </div>
-                            <p class="text-white mt-0">Más información</p>
-                        </a>
+                    <div class="col-md-6">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/f9aJ1Qmkvaw"
+                                    title="EL PUEBLO MÁGICO DE MITLA"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerpolicy="strict-origin-when-cross-origin"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -51,8 +51,10 @@ try {
     // Obtener información del tour
     $stmt = $db->prepare("
         SELECT r.*, 
-               p.nombre as paquete_nombre, p.duracion,
-               c.nombre as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono
+               p.nombre_paquete as paquete_nombre,
+               ROUND(p.duracion_horas * 60) as duracion,
+               r.fecha_tour as fecha_reservacion,
+               c.nombre_completo as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono
         FROM reservaciones r
         INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
         INNER JOIN clientes c ON r.id_cliente = c.id_cliente

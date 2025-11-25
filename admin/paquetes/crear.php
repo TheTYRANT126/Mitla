@@ -16,14 +16,12 @@ $datos = [
     'descripcion' => '',
     'descripcion_corta' => '',
     'precio_base' => '',
-    'duracion' => '',
     'max_personas' => '',
     'min_personas' => 1,
     'num_guias_requeridos' => 1,
     'incluye' => '',
     'no_incluye' => '',
     'recomendaciones' => '',
-    'orden' => 0,
     'horarios' => []
 ];
 
@@ -37,14 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'descripcion' => trim($_POST['descripcion'] ?? ''),
             'descripcion_corta' => trim($_POST['descripcion_corta'] ?? ''),
             'precio_base' => floatval($_POST['precio_base'] ?? 0),
-            'duracion' => intval($_POST['duracion'] ?? 0),
             'max_personas' => intval($_POST['max_personas'] ?? 0),
             'min_personas' => intval($_POST['min_personas'] ?? 1),
             'num_guias_requeridos' => intval($_POST['num_guias_requeridos'] ?? 1),
             'incluye' => trim($_POST['incluye'] ?? ''),
             'no_incluye' => trim($_POST['no_incluye'] ?? ''),
             'recomendaciones' => trim($_POST['recomendaciones'] ?? ''),
-            'orden' => intval($_POST['orden'] ?? 0),
             'horarios' => []
         ];
         
@@ -78,10 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errores[] = 'El precio debe ser mayor a cero';
         }
         
-        if ($datos['duracion'] <= 0) {
-            $errores[] = 'La duración debe ser mayor a cero';
-        }
-        
         if ($datos['max_personas'] <= 0) {
             $errores[] = 'El máximo de personas debe ser mayor a cero';
         }
@@ -100,13 +92,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (empty($datos['horarios'])) {
             $errores[] = 'Debe agregar al menos un horario';
+        } else {
+            $duracionCalculadaForm = calcularDuracionMinutosHorarios($datos['horarios']);
+            if ($duracionCalculadaForm <= 0) {
+                $errores[] = 'Los horarios deben tener una hora fin mayor a la hora de inicio para calcular la duración.';
+            }
         }
         
         // Si no hay errores, crear el paquete
         if (empty($errores)) {
             try {
                 $paqueteClass = new PaqueteAdmin();
-                $idPaquete = $paqueteClass->crear($datos);
+                $resultado = $paqueteClass->crear($datos);
+                
+                if (!($resultado['success'] ?? false)) {
+                    throw new Exception($resultado['message'] ?? 'No se pudo crear el paquete');
+                }
+                
+                $idPaquete = intval($resultado['id_paquete'] ?? 0);
+                if ($idPaquete <= 0) {
+                    throw new Exception('No se pudo determinar el ID del paquete creado');
+                }
                 
                 // Subir imagen banner si se proporcionó
                 if (isset($_FILES['imagen_banner']) && $_FILES['imagen_banner']['error'] === UPLOAD_ERR_OK) {
@@ -140,6 +146,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$diasMeta = [
+    ['key' => 'lunes', 'label' => 'L', 'nombre' => 'Lunes'],
+    ['key' => 'martes', 'label' => 'M', 'nombre' => 'Martes'],
+    ['key' => 'miercoles', 'label' => 'Mi', 'nombre' => 'Miércoles'],
+    ['key' => 'jueves', 'label' => 'J', 'nombre' => 'Jueves'],
+    ['key' => 'viernes', 'label' => 'V', 'nombre' => 'Viernes'],
+    ['key' => 'sabado', 'label' => 'S', 'nombre' => 'Sábado'],
+    ['key' => 'domingo', 'label' => 'D', 'nombre' => 'Domingo']
+];
+$estadoHorariosInicial = [];
+foreach ($diasMeta as $diaConfig) {
+    $estadoHorariosInicial[$diaConfig['key']] = [
+        'horarios' => [],
+        'cerrado' => true
+    ];
+}
+foreach ($datos['horarios'] as $horario) {
+    $dia = $horario['dias_semana'] ?? null;
+    if (!$dia || !isset($estadoHorariosInicial[$dia])) {
+        continue;
+    }
+    $estadoHorariosInicial[$dia]['horarios'][] = [
+        'hora_inicio' => substr($horario['hora_inicio'], 0, 5),
+        'hora_fin' => substr(($horario['hora_fin'] ?? $horario['hora_inicio']), 0, 5)
+    ];
+    $estadoHorariosInicial[$dia]['cerrado'] = false;
+}
+$estadoHorariosJSON = json_encode($estadoHorariosInicial, JSON_UNESCAPED_UNICODE);
+$duracionPreview = calcularDuracionMinutosHorarios($datos['horarios']);
+
 // Generar nuevo CSRF token
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
@@ -163,12 +199,47 @@ $pageTitle = 'Crear Paquete';
             margin-top: 10px;
             border-radius: 10px;
         }
-        .horario-item {
+        .dia-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .dia-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 2px solid #0dcaf0;
+            background: #fff;
+            color: #0dcaf0;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .dia-btn.active {
+            background: #0dcaf0;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(13,202,240,0.3);
+        }
+        .dia-card {
             border: 1px solid #dee2e6;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 15px;
-            margin-bottom: 15px;
-            background-color: #f8f9fa;
+            background: #f8f9fa;
+            min-height: 150px;
+        }
+        .dia-card.cerrado {
+            border-color: #f8d7da;
+            background: #fff5f5;
+        }
+        .horario-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            padding: 5px 12px;
+            margin: 0 8px 8px 0;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -182,7 +253,7 @@ $pageTitle = 'Crear Paquete';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-plus-square"></i> Crear Nuevo Paquete
+                        Crear Nuevo Paquete
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <a href="index.php" class="btn btn-outline-secondary">
@@ -212,7 +283,7 @@ $pageTitle = 'Crear Paquete';
                             <!-- Información Básica -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información Básica</h5>
+                                    <h5 class="mb-0">Información Básica</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -253,7 +324,7 @@ $pageTitle = 'Crear Paquete';
                                     </div>
                                     
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label for="precio_base" class="form-label">
                                                 Precio Base <span class="text-danger">*</span>
                                             </label>
@@ -270,29 +341,21 @@ $pageTitle = 'Crear Paquete';
                                             </div>
                                         </div>
                                         
-                                        <div class="col-md-4">
-                                            <label for="duracion" class="form-label">
-                                                Duración (minutos) <span class="text-danger">*</span>
+                                        <div class="col-md-6">
+                                            <label class="form-label">
+                                                Duración estimada
                                             </label>
-                                            <input type="number" 
+                                            <?php 
+                                                $duracionTexto = $duracionPreview > 0
+                                                    ? $duracionPreview . ' min'
+                                                    : 'Se calculará con los horarios';
+                                            ?>
+                                            <input type="text" 
                                                    class="form-control" 
-                                                   id="duracion" 
-                                                   name="duracion"
-                                                   value="<?php echo $datos['duracion']; ?>"
-                                                   min="1"
-                                                   required>
-                                        </div>
-                                        
-                                        <div class="col-md-4">
-                                            <label for="orden" class="form-label">
-                                                Orden de Visualización
-                                            </label>
-                                            <input type="number" 
-                                                   class="form-control" 
-                                                   id="orden" 
-                                                   name="orden"
-                                                   value="<?php echo $datos['orden']; ?>"
-                                                   min="0">
+                                                   id="duracion_preview"
+                                                   value="<?php echo htmlspecialchars($duracionTexto, ENT_QUOTES, 'UTF-8'); ?>"
+                                                   readonly>
+                                            <div class="form-text">La duración se calcula automáticamente cuando define los horarios.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -301,7 +364,7 @@ $pageTitle = 'Crear Paquete';
                             <!-- Capacidad y Guías -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0"><i class="fas fa-users"></i> Capacidad y Guías</h5>
+                                    <h5 class="mb-0">Capacidad y Guías</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -350,23 +413,57 @@ $pageTitle = 'Crear Paquete';
                             <!-- Horarios Disponibles -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-info text-white">
-                                    <h5 class="mb-0"><i class="fas fa-clock"></i> Horarios Disponibles</h5>
+                                    <h5 class="mb-0">Horarios Disponibles</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div id="horariosContainer">
-                                        <!-- Los horarios se agregarán aquí dinámicamente -->
+                                    <p class="text-muted">Selecciona los días y aplica el horario. Puedes repetir el proceso con distintos bloques o marcar un día como cerrado.</p>
+                                    <div class="mb-3">
+                                    <div class="dia-selector" id="selectorDias">
+                                        <?php foreach ($diasMeta as $dia): ?>
+                                        <button type="button" 
+                                                class="dia-btn" 
+                                                data-dia="<?php echo $dia['key']; ?>"
+                                                title="<?php echo $dia['nombre']; ?>">
+                                            <?php echo $dia['label']; ?>
+                                        </button>
+                                        <?php endforeach; ?>
                                     </div>
-                                    
-                                    <button type="button" class="btn btn-outline-info" onclick="agregarHorario()">
-                                        <i class="fas fa-plus"></i> Agregar Horario
-                                    </button>
+                                    </div>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Hora inicio</label>
+                                            <input type="time" class="form-control" id="hora_general_inicio">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Hora fin</label>
+                                            <input type="time" class="form-control" id="hora_general_fin">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Días seleccionados</label>
+                                            <div id="infoDiasSeleccionados" class="form-text">Ningún día seleccionado</div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-info w-100" id="btnAplicarHorario">
+                                                <i class="fas fa-check"></i> Aplicar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Resumen por día</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnLimpiarSeleccion">
+                                            Limpiar selección
+                                        </button>
+                                    </div>
+                                    <div id="resumenHorarios" class="row g-3"></div>
+                                    <div id="horariosHidden"></div>
                                 </div>
                             </div>
                             
                             <!-- Detalles Adicionales -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-warning">
-                                    <h5 class="mb-0"><i class="fas fa-list"></i> Detalles del Tour</h5>
+                                    <h5 class="mb-0">Detalles del Tour</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -410,7 +507,7 @@ $pageTitle = 'Crear Paquete';
                             <!-- Imagen Banner -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-secondary text-white">
-                                    <h5 class="mb-0"><i class="fas fa-image"></i> Imagen Principal</h5>
+                                    <h5 class="mb-0">Imagen Principal</h5>
                                 </div>
                                 <div class="card-body text-center">
                                     <img id="preview_banner" 
@@ -434,7 +531,7 @@ $pageTitle = 'Crear Paquete';
                             <!-- Galería de Imágenes -->
                             <div class="card shadow mb-4">
                                 <div class="card-header bg-dark text-white">
-                                    <h5 class="mb-0"><i class="fas fa-images"></i> Galería</h5>
+                                    <h5 class="mb-0">Galería</h5>
                                 </div>
                                 <div class="card-body">
                                     <label for="imagenes_galeria" class="btn btn-outline-dark w-100">
@@ -475,8 +572,6 @@ $pageTitle = 'Crear Paquete';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-    let horarioCount = 0;
-    
     // Preview imagen banner
     document.getElementById('imagen_banner').addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -509,65 +604,209 @@ $pageTitle = 'Crear Paquete';
         });
     });
     
-    // Agregar horario
-    function agregarHorario() {
-        horarioCount++;
-        
-        const horarioHTML = `
-            <div class="horario-item" id="horario_${horarioCount}">
-                <div class="d-flex justify-content-between mb-2">
-                    <h6>Horario #${horarioCount}</h6>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHorario(${horarioCount})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <label class="form-label">Hora Inicio <span class="text-danger">*</span></label>
-                        <input type="time" 
-                               class="form-control" 
-                               name="horarios[${horarioCount}][hora_inicio]"
-                               required>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label class="form-label">Hora Fin</label>
-                        <input type="time" 
-                               class="form-control" 
-                               name="horarios[${horarioCount}][hora_fin]">
-                    </div>
-                </div>
-                
-                <div class="mt-2">
-                    <label class="form-label">Días Disponibles</label>
-                    <select class="form-select" name="horarios[${horarioCount}][dias_semana]">
-                        <option value="todos">Todos los días</option>
-                        <option value="lunes_viernes">Lunes a Viernes</option>
-                        <option value="fines_semana">Fines de Semana</option>
-                        <option value="lunes">Solo Lunes</option>
-                        <option value="martes">Solo Martes</option>
-                        <option value="miercoles">Solo Miércoles</option>
-                        <option value="jueves">Solo Jueves</option>
-                        <option value="viernes">Solo Viernes</option>
-                        <option value="sabado">Solo Sábado</option>
-                        <option value="domingo">Solo Domingo</option>
-                    </select>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('horariosContainer').insertAdjacentHTML('beforeend', horarioHTML);
+    const diasConfig = <?php echo json_encode($diasMeta, JSON_UNESCAPED_UNICODE); ?>;
+    let estadoDias = <?php echo $estadoHorariosJSON; ?>;
+    const selectorDias = document.getElementById('selectorDias');
+    const infoDiasSeleccionados = document.getElementById('infoDiasSeleccionados');
+    const resumenHorarios = document.getElementById('resumenHorarios');
+    const horariosHidden = document.getElementById('horariosHidden');
+    const horaInicioField = document.getElementById('hora_general_inicio');
+    const horaFinField = document.getElementById('hora_general_fin');
+    const btnAplicarHorario = document.getElementById('btnAplicarHorario');
+    const btnLimpiarSeleccion = document.getElementById('btnLimpiarSeleccion');
+    const duracionPreviewInput = document.getElementById('duracion_preview');
+    const diasSeleccionados = new Set();
+
+    function obtenerNombreDia(clave) {
+        const dia = diasConfig.find(d => d.key === clave);
+        return dia ? dia.nombre : clave;
     }
-    
-    function eliminarHorario(id) {
-        if (confirm('¿Está seguro de eliminar este horario?')) {
-            document.getElementById(`horario_${id}`).remove();
+
+    function refrescarSeleccionVisual() {
+        if (!selectorDias) return;
+        selectorDias.querySelectorAll('.dia-btn').forEach(btn => {
+            const dia = btn.getAttribute('data-dia');
+            btn.classList.toggle('active', diasSeleccionados.has(dia));
+        });
+        if (infoDiasSeleccionados) {
+            infoDiasSeleccionados.textContent = diasSeleccionados.size
+                ? Array.from(diasSeleccionados).map(obtenerNombreDia).join(', ')
+                : 'Ningún día seleccionado';
         }
     }
-    
-    // Agregar un horario por defecto
-    agregarHorario();
+
+    function limpiarSeleccionDias() {
+        diasSeleccionados.clear();
+        refrescarSeleccionVisual();
+    }
+
+    if (selectorDias) {
+        selectorDias.addEventListener('click', (event) => {
+            const boton = event.target.closest('.dia-btn');
+            if (!boton) return;
+            const dia = boton.getAttribute('data-dia');
+            if (diasSeleccionados.has(dia)) {
+                diasSeleccionados.delete(dia);
+            } else {
+                diasSeleccionados.add(dia);
+            }
+            refrescarSeleccionVisual();
+        });
+    }
+
+    function convertirHoraAMinutos(valor) {
+        if (!valor) return null;
+        const [h, m] = valor.split(':').map(Number);
+        if (Number.isNaN(h) || Number.isNaN(m)) return null;
+        return h * 60 + m;
+    }
+
+    function calcularDuracionLocal() {
+        let maxDuracion = 0;
+        diasConfig.forEach(dia => {
+            const estado = estadoDias[dia.key] || {horarios: []};
+            (estado.horarios || []).forEach(h => {
+                const inicio = convertirHoraAMinutos(h.hora_inicio);
+                const fin = convertirHoraAMinutos(h.hora_fin);
+                if (inicio === null || fin === null) return;
+                let duracion = fin - inicio;
+                if (duracion <= 0) {
+                    duracion += 24 * 60;
+                }
+                if (duracion > maxDuracion) {
+                    maxDuracion = duracion;
+                }
+            });
+        });
+        return maxDuracion;
+    }
+
+    function sincronizarHorariosHidden() {
+        if (!horariosHidden) return;
+        horariosHidden.innerHTML = '';
+        let index = 0;
+        diasConfig.forEach(dia => {
+            const estado = estadoDias[dia.key] || {horarios: []};
+            estado.horarios.forEach(h => {
+                horariosHidden.insertAdjacentHTML('beforeend', `
+                    <input type="hidden" name="horarios[${index}][hora_inicio]" value="${h.hora_inicio}">
+                    <input type="hidden" name="horarios[${index}][hora_fin]" value="${h.hora_fin}">
+                    <input type="hidden" name="horarios[${index}][dias_semana]" value="${dia.key}">
+                `);
+                index++;
+            });
+        });
+    }
+
+    function renderizarHorarios() {
+        if (!resumenHorarios) return;
+        resumenHorarios.innerHTML = '';
+        diasConfig.forEach(dia => {
+            if (!estadoDias[dia.key]) {
+                estadoDias[dia.key] = {horarios: [], cerrado: true};
+            }
+            const estado = estadoDias[dia.key];
+            const estaCerrado = estado.horarios.length === 0 && estado.cerrado;
+            const card = document.createElement('div');
+            card.className = 'col-md-6 col-lg-4';
+            let contenido = '';
+            if (estado.horarios.length > 0) {
+                contenido = estado.horarios.map((horario, idx) => `
+                    <span class="horario-tag">
+                        ${horario.hora_inicio} - ${horario.hora_fin}
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0" data-action="eliminar-horario" data-dia="${dia.key}" data-index="${idx}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </span>
+                `).join('');
+            } else {
+                contenido = `<span class="badge ${estaCerrado ? 'bg-danger' : 'bg-secondary'}">${estaCerrado ? 'Cerrado' : 'Sin horario'}</span>`;
+            }
+            card.innerHTML = `
+                <div class="dia-card ${estaCerrado ? 'cerrado' : ''}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>${dia.nombre}</strong>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-primary" data-action="seleccionar-dia" data-dia="${dia.key}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-${estaCerrado ? 'success' : 'danger'}" data-action="toggle-cerrado" data-dia="${dia.key}">
+                                ${estaCerrado ? 'Reabrir' : 'Cerrar'}
+                            </button>
+                        </div>
+                    </div>
+                    <div>${contenido}</div>
+                </div>
+            `;
+            resumenHorarios.appendChild(card);
+        });
+        sincronizarHorariosHidden();
+        const duracion = calcularDuracionLocal();
+        if (duracionPreviewInput) {
+            duracionPreviewInput.value = duracion > 0 ? `${duracion} min` : 'Se calculará con los horarios';
+        }
+    }
+
+    function manejarResumenClick(event) {
+        const accion = event.target.closest('[data-action]');
+        if (!accion) return;
+        const dia = accion.getAttribute('data-dia');
+        const tipo = accion.getAttribute('data-action');
+        if (!estadoDias[dia]) {
+            estadoDias[dia] = {horarios: [], cerrado: true};
+        }
+        if (tipo === 'seleccionar-dia') {
+            limpiarSeleccionDias();
+            diasSeleccionados.add(dia);
+            refrescarSeleccionVisual();
+            horaInicioField && horaInicioField.focus();
+        } else if (tipo === 'toggle-cerrado') {
+            estadoDias[dia].horarios = [];
+            estadoDias[dia].cerrado = !estadoDias[dia].cerrado;
+            renderizarHorarios();
+        } else if (tipo === 'eliminar-horario') {
+            const idx = parseInt(accion.getAttribute('data-index'), 10);
+            estadoDias[dia].horarios.splice(idx, 1);
+            if (estadoDias[dia].horarios.length === 0) {
+                estadoDias[dia].cerrado = true;
+            }
+            renderizarHorarios();
+        }
+    }
+
+    if (resumenHorarios) {
+        resumenHorarios.addEventListener('click', manejarResumenClick);
+    }
+
+    if (btnAplicarHorario) {
+        btnAplicarHorario.addEventListener('click', () => {
+            if (diasSeleccionados.size === 0) {
+                alert('Seleccione al menos un día.');
+                return;
+            }
+            const inicio = horaInicioField.value;
+            const fin = horaFinField.value;
+            if (!inicio || !fin) {
+                alert('Defina hora de inicio y fin.');
+                return;
+            }
+            diasSeleccionados.forEach(dia => {
+                if (!estadoDias[dia]) {
+                    estadoDias[dia] = {horarios: [], cerrado: true};
+                }
+                estadoDias[dia].horarios.push({hora_inicio: inicio, hora_fin: fin});
+                estadoDias[dia].cerrado = false;
+            });
+            limpiarSeleccionDias();
+            renderizarHorarios();
+        });
+    }
+
+    if (btnLimpiarSeleccion) {
+        btnLimpiarSeleccion.addEventListener('click', limpiarSeleccionDias);
+    }
+
+    renderizarHorarios();
     
     // Validación del formulario
     document.getElementById('formPaquete').addEventListener('submit', function(e) {
@@ -580,9 +819,8 @@ $pageTitle = 'Crear Paquete';
             return false;
         }
         
-        // Verificar que haya al menos un horario
-        const horarios = document.querySelectorAll('.horario-item');
-        if (horarios.length === 0) {
+        const contHorarios = document.getElementById('horariosHidden');
+        if (!contHorarios || contHorarios.querySelectorAll('input').length === 0) {
             e.preventDefault();
             alert('Debe agregar al menos un horario');
             return false;

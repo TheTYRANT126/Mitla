@@ -38,19 +38,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $datos = $reporteClass->reporteVentas($fechaInicio, $fechaFin, $formato);
                         
                         if ($formato === 'pdf') {
-                            $rutaPDF = $pdfClass->generarReporteVentas($fechaInicio, $fechaFin, $datos);
+                            $reporte = $pdfClass->generarReporteVentas($fechaInicio, $fechaFin, $datos);
                             $mensaje = 'Reporte generado correctamente';
                             $mensajeTipo = 'success';
-                            $_SESSION['ultimo_reporte'] = basename($rutaPDF);
+                            $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         } else {
-                            $rutaCSV = $reporteClass->exportarCSV(
-                                $datos['ventas_por_dia'],
+                            $csvDatos = array_map(function($fila) {
+                                return [
+                                    formatearFecha($fila['fecha_tour'], 'd/m/Y'),
+                                    $fila['reservaciones'],
+                                    $fila['personas'],
+                                    number_format($fila['ingresos'], 2, '.', '')
+                                ];
+                            }, $datos['por_dia']);
+                            
+                            $reporte = $reporteClass->exportarCSV(
+                                $csvDatos,
                                 'reporte_ventas_' . date('Y-m-d'),
                                 ['Fecha', 'Total Reservaciones', 'Total Personas', 'Ingresos']
                             );
                             $mensaje = 'Reporte generado correctamente';
                             $mensajeTipo = 'success';
-                            $_SESSION['ultimo_reporte'] = basename($rutaCSV);
+                            $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         }
                         break;
                         
@@ -58,19 +67,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $datos = $reporteClass->reporteGuias($fechaInicio, $fechaFin);
                         
                         if ($formato === 'pdf') {
-                            $rutaPDF = $pdfClass->generarReporteGuias($fechaInicio, $fechaFin, $datos);
+                            $reporte = $pdfClass->generarReporteGuias($fechaInicio, $fechaFin, $datos);
                             $mensaje = 'Reporte generado correctamente';
                             $mensajeTipo = 'success';
-                            $_SESSION['ultimo_reporte'] = basename($rutaPDF);
+                            $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         } else {
-                            $rutaCSV = $reporteClass->exportarCSV(
-                                $datos,
+                            $csvDatos = array_map(function($fila) {
+                                return [
+                                    $fila['nombre_completo'],
+                                    $fila['tours_asignados'],
+                                    $fila['total_personas_atendidas'],
+                                    $fila['dias_trabajados']
+                                ];
+                            }, $datos);
+                            
+                            $reporte = $reporteClass->exportarCSV(
+                                $csvDatos,
                                 'reporte_guias_' . date('Y-m-d'),
                                 ['Guía', 'Tours', 'Personas Atendidas', 'Días Trabajados']
                             );
                             $mensaje = 'Reporte generado correctamente';
                             $mensajeTipo = 'success';
-                            $_SESSION['ultimo_reporte'] = basename($rutaCSV);
+                            $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         }
                         break;
                         
@@ -78,45 +96,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $datos = $reporteClass->reporteOcupacion($fechaInicio, $fechaFin);
                         
                         if ($formato === 'pdf') {
-                            // Se puede crear un método específico para ocupación si se necesita
-                            $rutaPDF = $pdfClass->generarReporteVentas($fechaInicio, $fechaFin, ['ocupacion' => $datos]);
+                            $reporte = $pdfClass->generarReporteOcupacion($fechaInicio, $fechaFin, $datos);
                             $mensaje = 'Reporte generado correctamente';
                             $mensajeTipo = 'success';
-                            $_SESSION['ultimo_reporte'] = basename($rutaPDF);
+                            $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         } else {
-                            $rutaCSV = $reporteClass->exportarCSV(
-                                $datos,
+                            $csvDatos = array_map(function($fila) {
+                                return [
+                                    $fila['nombre_paquete'],
+                                    formatearFecha($fila['fecha_tour'], 'd/m/Y'),
+                                    date('H:i', strtotime($fila['hora_inicio'])),
+                                    $fila['capacidad_maxima'],
+                                    $fila['ocupados'],
+                                    $fila['disponibles'],
+                                    $fila['porcentaje_ocupacion']
+                                ];
+                            }, $datos);
+                            
+                            $reporte = $reporteClass->exportarCSV(
+                                $csvDatos,
                                 'reporte_ocupacion_' . date('Y-m-d'),
                                 ['Paquete', 'Fecha', 'Hora', 'Capacidad Total', 'Reservados', 'Disponibles', 'Ocupación %']
                             );
                             $mensaje = 'Reporte generado correctamente';
                             $mensajeTipo = 'success';
-                            $_SESSION['ultimo_reporte'] = basename($rutaCSV);
+                            $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         }
                         break;
                         
                     case 'clientes':
                         $datos = $reporteClass->reporteClientes($fechaInicio, $fechaFin);
-                        $rutaCSV = $reporteClass->exportarCSV(
-                            $datos,
+                        $csvDatos = array_map(function($fila) {
+                            return [
+                                $fila['nombre_completo'],
+                                $fila['email'],
+                                $fila['telefono'] ?? '',
+                                $fila['total_reservaciones'],
+                                $fila['total_personas'],
+                                number_format($fila['total_gastado'], 2, '.', ''),
+                                $fila['ultima_visita'] ? formatearFecha($fila['ultima_visita'], 'd/m/Y') : ''
+                            ];
+                        }, $datos);
+                        
+                        $reporte = $reporteClass->exportarCSV(
+                            $csvDatos,
                             'reporte_clientes_' . date('Y-m-d'),
-                            ['Cliente', 'Email', 'Teléfono', 'Total Reservaciones', 'Total Gastado', 'Última Visita']
+                            ['Cliente', 'Email', 'Teléfono', 'Total Reservaciones', 'Total Personas', 'Total Gastado', 'Última Visita']
                         );
                         $mensaje = 'Reporte generado correctamente';
                         $mensajeTipo = 'success';
-                        $_SESSION['ultimo_reporte'] = basename($rutaCSV);
+                        $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         break;
                         
                     case 'cancelaciones':
                         $datos = $reporteClass->reporteCancelaciones($fechaInicio, $fechaFin);
-                        $rutaCSV = $reporteClass->exportarCSV(
-                            $datos,
+                        $csvDatos = array_map(function($fila) {
+                            return [
+                                $fila['codigo_reservacion'],
+                                $fila['nombre_completo'],
+                                $fila['nombre_paquete'],
+                                $fila['fecha_tour'] ? formatearFecha($fila['fecha_tour'], 'd/m/Y') : '',
+                                number_format($fila['monto_cancelado'], 2, '.', ''),
+                                $fila['fecha_cancelacion'] ? date('d/m/Y H:i', strtotime($fila['fecha_cancelacion'])) : '',
+                                $fila['motivo']
+                            ];
+                        }, $datos);
+                        
+                        $reporte = $reporteClass->exportarCSV(
+                            $csvDatos,
                             'reporte_cancelaciones_' . date('Y-m-d'),
                             ['Código', 'Cliente', 'Paquete', 'Fecha Tour', 'Monto', 'Fecha Cancelación', 'Motivo']
                         );
                         $mensaje = 'Reporte generado correctamente';
                         $mensajeTipo = 'success';
-                        $_SESSION['ultimo_reporte'] = basename($rutaCSV);
+                        $_SESSION['ultimo_reporte'] = basename($reporte['ruta']);
                         break;
                         
                     default:

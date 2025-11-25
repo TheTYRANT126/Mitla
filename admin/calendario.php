@@ -181,18 +181,7 @@ $pageTitle = 'Calendario de Disponibilidad';
                     </div>
                 </div>
                 
-                <!-- Leyenda -->
-                <div class="mb-3">
-                    <span class="legend-item" style="background-color: #e6f3ff; border: 1px solid #0066cc;">
-                        <i class="fas fa-calendar-check"></i> Con Reservas
-                    </span>
-                    <span class="legend-item" style="background-color: #ffe6e6; border: 1px solid #dc3545;">
-                        <i class="fas fa-ban"></i> Desactivado
-                    </span>
-                    <span class="legend-item" style="background-color: white; border: 2px solid #0066cc;">
-                        <i class="fas fa-star"></i> Hoy
-                    </span>
-                </div>
+                <!-- Leyenda eliminada -->
                 
                 <!-- Calendario -->
                 <div class="card shadow">
@@ -346,7 +335,7 @@ $pageTitle = 'Calendario de Disponibilidad';
         modal.show();
         
         // Cargar datos del día
-        fetch(`<?php echo SITE_URL; ?>/api/admin/obtener-dia.php?fecha=${fecha}&id_paquete=${idPaquete}`)
+        fetch(`<?php echo SITE_URL; ?>/api/obtener-dia.php?fecha=${fecha}&id_paquete=${idPaquete}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -379,9 +368,23 @@ $pageTitle = 'Calendario de Disponibilidad';
             `;
         } else {
             html += `
-                <button class="btn btn-danger w-100 mb-3" onclick="desactivarDia('${fecha}')">
-                    <i class="fas fa-ban"></i> Desactivar Este Día
-                </button>
+                <div id="desactivarDiaWrapper">
+                    <button class="btn btn-danger w-100 mb-3" onclick="mostrarFormularioDesactivar()">
+                        <i class="fas fa-ban"></i> Desactivar Este Día
+                    </button>
+                    <div id="desactivarDiaForm" class="d-none">
+                        <div class="mb-3">
+                            <label class="form-label">Motivo de desactivación</label>
+                            <textarea class="form-control" id="motivoDesactivarInput" rows="3" placeholder="Describe por qué se inhabilita este día"></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-danger" onclick="confirmarDesactivarDia('${fecha}')">
+                                <i class="fas fa-check-circle"></i> Confirmar desactivación
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="cancelarDesactivarDia()" type="button">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
             `;
         }
         
@@ -423,8 +426,24 @@ $pageTitle = 'Calendario de Disponibilidad';
         modalBody.innerHTML = html;
     }
     
-    function desactivarDia(fecha) {
-        const motivo = prompt('Ingrese el motivo para desactivar este día:');
+    function mostrarFormularioDesactivar() {
+        document.getElementById('desactivarDiaForm')?.classList.remove('d-none');
+    }
+    
+    function cancelarDesactivarDia() {
+        const form = document.getElementById('desactivarDiaForm');
+        if (form) {
+            form.classList.add('d-none');
+            const textarea = document.getElementById('motivoDesactivarInput');
+            if (textarea) {
+                textarea.value = '';
+            }
+        }
+    }
+    
+    function confirmarDesactivarDia(fecha) {
+        const motivoInput = document.getElementById('motivoDesactivarInput');
+        const motivo = motivoInput ? motivoInput.value.trim() : '';
         
         if (!motivo) {
             alert('Debe proporcionar un motivo');

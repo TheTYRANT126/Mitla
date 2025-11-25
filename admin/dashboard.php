@@ -43,6 +43,51 @@ $pageTitle = 'Dashboard';
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin/admin.css">
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin/dashboard.css">
+
+    <style>
+        /* Estilos personalizados para las tarjetas de estadísticas */
+        .card.border-left-primary,
+        .card.border-left-success,
+        .card.border-left-info,
+        .card.border-left-warning {
+            border: 2px solid !important;
+            border-left-width: 4px !important;
+        }
+
+        .card.border-left-primary {
+            border-color: #4e73df !important;
+        }
+
+        .card.border-left-success {
+            border-color: #1cc88a !important;
+        }
+
+        .card.border-left-info {
+            border-color: #36b9cc !important;
+        }
+
+        .card.border-left-warning {
+            border-color: #f6c23e !important;
+        }
+
+        /* Asegurar que los textos sean negros */
+        .text-gray-800,
+        .card-body .h5 {
+            color: #000000 !important;
+        }
+
+        /* Títulos de las tarjetas en negro */
+        .card-body .text-primary,
+        .card-body .text-success,
+        .card-body .text-info,
+        .card-body .text-warning {
+            color: #000000 !important;
+        }
+
+        .text-xs {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <?php include __DIR__ . '/includes/header.php'; ?>
@@ -273,8 +318,8 @@ $pageTitle = 'Dashboard';
                                                     <td>
                                                         <strong><?php echo htmlspecialchars($reserva['codigo_reservacion']); ?></strong>
                                                     </td>
-                                                    <td><?php echo htmlspecialchars($reserva['nombre_completo']); ?></td>
-                                                    <td><?php echo htmlspecialchars($reserva['nombre_paquete']); ?></td>
+                                                    <td><?php echo htmlspecialchars($reserva['cliente_nombre']); ?></td>
+                                                    <td><?php echo htmlspecialchars($reserva['paquete_nombre']); ?></td>
                                                     <td><?php echo date('g:i a', strtotime($reserva['hora_inicio'])); ?></td>
                                                     <td>
                                                         <i class="fas fa-users"></i> <?php echo $reserva['numero_personas']; ?>

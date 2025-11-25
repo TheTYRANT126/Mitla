@@ -119,6 +119,33 @@ function verificarCSRFToken($token) {
            hash_equals($_SESSION[CSRF_TOKEN_NAME], $token);
 }
 
+if (!function_exists('tableExists')) {
+    function tableExists($pdoConnection, $tableName) {
+        static $cache = [];
+        if (!$pdoConnection || !$tableName) {
+            return false;
+        }
+        $tableName = trim($tableName);
+        if (isset($cache[$tableName])) {
+            return $cache[$tableName];
+        }
+        try {
+            $stmt = $pdoConnection->prepare("
+                SELECT COUNT(*)
+                FROM information_schema.tables
+                WHERE table_schema = DATABASE()
+                  AND table_name = ?
+            ");
+            $stmt->execute([$tableName]);
+            $cache[$tableName] = $stmt->fetchColumn() > 0;
+        } catch (Exception $e) {
+            error_log('Error verificando tabla ' . $tableName . ': ' . $e->getMessage());
+            $cache[$tableName] = false;
+        }
+        return $cache[$tableName];
+    }
+}
+
 function redirect($url) {
     header("Location: " . $url);
     exit();
@@ -222,6 +249,278 @@ function requireAdmin() {
     if (!isAdmin()) {
         redirect(SITE_URL . '/admin/login.php');
     }
+}
+
+function getPackageImageUrl($filename) {
+    if (empty($filename)) {
+        return null;
+    }
+
+    if (filter_var($filename, FILTER_VALIDATE_URL)) {
+        return $filename;
+    }
+
+    $normalized = ltrim(str_replace('\\', '/', $filename), '/');
+
+    $locations = [
+        ASSETS_PATH . '/img/packages/' => ASSETS_URL . '/img/packages/',
+        ASSETS_PATH . '/img/paquete/' => ASSETS_URL . '/img/paquete/',
+        UPLOADS_PATH . '/paquetes/' => UPLOADS_URL . '/paquetes/'
+    ];
+
+    foreach ($locations as $diskPath => $baseUrl) {
+        $fullDiskPath = rtrim($diskPath, '/\\') . '/' . $normalized;
+        if (is_file($fullDiskPath)) {
+            return rtrim($baseUrl, '/') . '/' . $normalized;
+        }
+    }
+
+    $assetRelative = ltrim(preg_replace('#^assets/#i', '', $normalized), '/');
+    $assetPath = rtrim(ASSETS_PATH, '/\\') . '/' . $assetRelative;
+    if (is_file($assetPath)) {
+        return rtrim(ASSETS_URL, '/') . '/' . $assetRelative;
+    }
+
+    $absolutePath = BASE_PATH . '/' . $normalized;
+    if (is_file($absolutePath)) {
+        return SITE_URL . '/' . $normalized;
+    }
+
+    return null;
+}
+
+function getPackageGalleryDirectory() {
+    return rtrim(ASSETS_PATH, '/\\') . '/img/paquete';
+}
+
+function getPackageGalleryImages($idPaquete) {
+    $idPaquete = intval($idPaquete);
+    if ($idPaquete <= 0) {
+        return [];
+    }
+
+    $dir = getPackageGalleryDirectory();
+    if (!is_dir($dir)) {
+        return [];
+    }
+
+    $entries = scandir($dir);
+    $imagenes = [];
+    $pattern = '/^galeria-' . $idPaquete . '-(\d+)\.(jpg|jpeg|png|gif|webp)$/i';
+
+    foreach ($entries as $entry) {
+        if (!preg_match($pattern, $entry, $matches)) {
+            continue;
+        }
+        $indice = (int) $matches[1];
+        $imagenes[] = [
+            'id_imagen' => null,
+            'filename' => $entry,
+            'index' => $indice,
+            'url' => ASSETS_URL . '/img/paquete/' . $entry,
+            'source' => 'filesystem'
+        ];
+    }
+
+    usort($imagenes, function ($a, $b) {
+        return $a['index'] <=> $b['index'];
+    });
+
+    return $imagenes;
+}
+
+function normalizePackageGalleryIndices($idPaquete) {
+    $imagenes = getPackageGalleryImages($idPaquete);
+    if (empty($imagenes)) {
+        return [];
+    }
+
+    $dir = getPackageGalleryDirectory();
+    $contador = 1;
+    foreach ($imagenes as $imagen) {
+        $extension = pathinfo($imagen['filename'], PATHINFO_EXTENSION);
+        $nuevoNombre = sprintf('galeria-%d-%d.%s', $idPaquete, $contador, $extension);
+        if (strcasecmp($imagen['filename'], $nuevoNombre) !== 0) {
+            $rutaActual = $dir . '/' . $imagen['filename'];
+            $rutaNueva = $dir . '/' . $nuevoNombre;
+            if (is_file($rutaNueva)) {
+                @unlink($rutaNueva);
+            }
+            @rename($rutaActual, $rutaNueva);
+        }
+        $contador++;
+    }
+
+    clearstatcache();
+    return getPackageGalleryImages($idPaquete);
+}
+
+function getPackageExtraDetailsDefaults() {
+    return [
+        'plan_visita' => '',
+        'servicios_ofrecidos' => 'Visita guiada, interpretación cultural y natural, centro de visitantes con sanitarios, área de hidratación, módulos informativos y venta de artesanías locales.',
+        'transporte' => 'Acceso por carretera Mitla-Unión Zapata (aprox. 10 min). Transporte comunitario disponible desde Mitla. Estacionamiento limitado para autos particulares. Posibilidad de transporte contratado para grupos.',
+        'infraestructura' => 'Senderos señalizados, áreas de descanso, barandales en puntos estratégicos, señalética bilingüe (español-inglés), Centro Interpretativo con sala de exposición y audiovisuales.',
+        'lugares_interes' => 'Zona arqueológica de Mitla, Templo de San Pablo, Mercado de Mitla, Parador turístico de Hierve el Agua, talleres de textiles y mezcal en comunidades vecinas.',
+        'recomendaciones_visitantes' => 'Ropa ligera y cómoda, calzado para caminata, sombrero o gorra, bloqueador solar biodegradable, agua personal reutilizable, repelente natural. No se permiten drones, bocinas o basura.',
+        'mapa_widget' => ''
+    ];
+}
+
+function ensurePackageDetailsTable($pdoConnection) {
+    static $ensured = false;
+    if ($ensured) {
+        return true;
+    }
+
+    try {
+        if (!tableExists($pdoConnection, 'paquete_detalles')) {
+            $pdoConnection->exec("
+                CREATE TABLE IF NOT EXISTS `paquete_detalles` (
+                    `id_paquete` INT(11) NOT NULL,
+                    `plan_visita` TEXT NULL,
+                    `servicios_ofrecidos` TEXT NULL,
+                    `transporte` TEXT NULL,
+                    `infraestructura` TEXT NULL,
+                    `lugares_interes` TEXT NULL,
+                    `recomendaciones_visitantes` TEXT NULL,
+                    `mapa_widget` TEXT NULL,
+                    `creado_en` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                    `actualizado_en` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    PRIMARY KEY (`id_paquete`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ");
+        }
+        $ensured = true;
+        return true;
+    } catch (Exception $e) {
+        error_log('No se pudo asegurar la tabla paquete_detalles: ' . $e->getMessage());
+        return false;
+    }
+}
+
+function getPackageExtraDetails($idPaquete) {
+    $defaults = getPackageExtraDetailsDefaults();
+    $idPaquete = (int) $idPaquete;
+    if ($idPaquete <= 0) {
+        return $defaults;
+    }
+
+    $pdo = Database::getInstance()->getConnection();
+    if (!ensurePackageDetailsTable($pdo)) {
+        return $defaults;
+    }
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT plan_visita, servicios_ofrecidos, transporte, infraestructura,
+                   lugares_interes, recomendaciones_visitantes, mapa_widget
+            FROM paquete_detalles
+            WHERE id_paquete = ?
+        ");
+        $stmt->execute([$idPaquete]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$fila) {
+            return $defaults;
+        }
+        return array_merge($defaults, array_intersect_key($fila, $defaults));
+    } catch (Exception $e) {
+        error_log('Error obteniendo detalles de paquete ' . $idPaquete . ': ' . $e->getMessage());
+        return $defaults;
+    }
+}
+
+function savePackageExtraDetails($idPaquete, array $detalles) {
+    $idPaquete = (int) $idPaquete;
+    if ($idPaquete <= 0) {
+        return false;
+    }
+
+    $pdo = Database::getInstance()->getConnection();
+    if (!ensurePackageDetailsTable($pdo)) {
+        return false;
+    }
+
+    $defaults = getPackageExtraDetailsDefaults();
+    $payload = array_merge($defaults, array_intersect_key($detalles, $defaults));
+    $columnas = array_keys($defaults);
+    $placeholders = implode(', ', array_fill(0, count($columnas), '?'));
+    $updateClause = implode(', ', array_map(function ($col) {
+        return "$col = VALUES($col)";
+    }, $columnas));
+
+    $sql = "INSERT INTO paquete_detalles (id_paquete, " . implode(', ', $columnas) . ")
+            VALUES (? , $placeholders)
+            ON DUPLICATE KEY UPDATE $updateClause";
+
+    $params = array_merge([$idPaquete], array_values($payload));
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return true;
+    } catch (Exception $e) {
+        error_log('Error guardando detalles extra de paquete ' . $idPaquete . ': ' . $e->getMessage());
+        return false;
+    }
+}
+
+function getPackageCoverImageUrl($idPaquete, array $candidatos = []) {
+    $idPaquete = intval($idPaquete);
+    if ($idPaquete <= 0) {
+        return null;
+    }
+
+    foreach ($candidatos as $candidate) {
+        $url = getPackageImageUrl($candidate);
+        if ($url) {
+            return $url;
+        }
+    }
+
+    $packagesDir = ASSETS_PATH . '/img/packages/';
+    if (is_dir($packagesDir)) {
+        $extensiones = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        foreach ($extensiones as $ext) {
+            $ruta = $packagesDir . "package-{$idPaquete}." . $ext;
+            if (is_file($ruta)) {
+                return ASSETS_URL . '/img/packages/' . "package-{$idPaquete}." . $ext;
+            }
+        }
+    }
+
+    return null;
+}
+
+function calcularDuracionMinutosHorarios(array $horarios) {
+    $maxDuracion = 0;
+    foreach ($horarios as $horario) {
+        $horaInicio = $horario['hora_inicio'] ?? null;
+        if (empty($horaInicio)) {
+            continue;
+        }
+        $inicio = strtotime($horaInicio);
+        if ($inicio === false) {
+            continue;
+        }
+        $horaFin = $horario['hora_fin'] ?? null;
+        if (empty($horaFin)) {
+            $duracion = 60; // default a 1 hora si no se especifica fin
+        } else {
+            $fin = strtotime($horaFin);
+            if ($fin === false) {
+                continue;
+            }
+            if ($fin <= $inicio) {
+                $fin += 24 * 60 * 60; // permitir horarios que cruzan medianoche
+            }
+            $duracion = ($fin - $inicio) / 60;
+        }
+        if ($duracion > $maxDuracion) {
+            $maxDuracion = $duracion;
+        }
+    }
+    return (int) round($maxDuracion);
 }
 
 function logActivity($message, $level = 'info') {

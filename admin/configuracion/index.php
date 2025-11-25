@@ -78,6 +78,12 @@ $pageTitle = 'Configuración del Sistema';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin/admin.css">
+    <style>
+        .bg-custom-yellow {
+            background-color: #C7C760 !important;
+            color: #fff; /* Texto blanco para mejor contraste */
+        }
+    </style>
 </head>
 <body>
     <?php include __DIR__ . '/../includes/header.php'; ?>
@@ -162,7 +168,7 @@ $pageTitle = 'Configuración del Sistema';
                             
                             <!-- Configuración de Cancelaciones -->
                             <div class="card shadow mb-4">
-                                <div class="card-header bg-warning">
+                                <div class="card-header bg-custom-yellow">
                                     <h5 class="mb-0">Configuración de Cancelaciones</h5>
                                 </div>
                                 <div class="card-body">
@@ -275,7 +281,9 @@ $pageTitle = 'Configuración del Sistema';
                                     $ultimaMod = $stmt->fetch(PDO::FETCH_ASSOC);
                                     if ($ultimaMod) {
                                         echo date('d/m/Y H:i', strtotime($ultimaMod['fecha_modificacion']));
-                                        echo '<br><small class="text-muted">por ' . htmlspecialchars($ultimaMod['nombre_completo']) . '</small>';
+                                        if ($ultimaMod['nombre_completo']) {
+                                            echo '<br><small class="text-muted">por ' . htmlspecialchars($ultimaMod['nombre_completo']) . '</small>';
+                                        }
                                     } else {
                                         echo 'Nunca modificado';
                                     }
@@ -283,29 +291,7 @@ $pageTitle = 'Configuración del Sistema';
                                 </p>
                             </div>
                         </div>
-                        
-                        <!-- Accesos Rápidos -->
-                        <div class="card shadow mb-4">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0">Accesos Rápidos</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-grid gap-2">
-                                    <a href="cambiar-password.php" class="btn btn-outline-primary">
-                                        Cambiar Contraseña
-                                    </a>
-                                    
-                                    <a href="../logs/" class="btn btn-outline-secondary">
-                                        Ver Logs
-                                    </a>
-                                    
-                                    <a href="../reportes.php" class="btn btn-outline-success">
-                                        Generar Reportes
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
+
                         <!-- Ayuda -->
                         <div class="card shadow">
                             <div class="card-header bg-dark text-white">

@@ -81,7 +81,7 @@ $lang = getLanguage();
     </nav>
     
     <!-- Confirmación de Reservación -->
-    <section class="confirmation-section" style="margin-top: 100px;">
+    <section class="confirmation-section" style="margin-top: 70px;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
@@ -188,10 +188,10 @@ $lang = getLanguage();
                         <button onclick="window.print()" class="btn btn-primary btn-lg">
                             <i class="fas fa-print"></i> Imprimir Ticket
                         </button>
-                        <button onclick="descargarPDF()" class="btn btn-outline-primary btn-lg ms-3">
+                        <button onclick="descargarPDF()" class="btn btn-download-pdf btn-lg ms-3">
                             <i class="fas fa-file-pdf"></i> Descargar PDF
                         </button>
-                        <a href="<?php echo SITE_URL; ?>" class="btn btn-outline-secondary btn-lg ms-3">
+                        <a href="<?php echo SITE_URL; ?>" class="btn btn-home btn-lg ms-3">
                             <i class="fas fa-home"></i> Volver al Inicio
                         </a>
                     </div>
@@ -230,7 +230,7 @@ $lang = getLanguage();
     </section>
     
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
+    <footer class="bg-dark text-white py-4">
         <div class="container text-center">
             <p class="mb-2">
                 <i class="fas fa-envelope"></i> <?php echo SITE_EMAIL; ?> | 

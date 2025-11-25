@@ -24,10 +24,13 @@ $db = Database::getInstance()->getConnection();
 
 // Obtener información de la reservación
 $stmt = $db->prepare("
-    SELECT r.*, 
-           c.nombre as cliente_nombre,
-           p.nombre as paquete_nombre,
-           p.num_guias_requeridos
+    SELECT r.*,
+           r.fecha_tour AS fecha_reservacion,
+           r.idioma_tour AS idioma,
+           r.numero_guias_requeridos AS num_guias_requeridos,
+           c.nombre_completo AS cliente_nombre,
+           p.nombre_paquete AS paquete_nombre,
+           p.personas_por_guia
     FROM reservaciones r
     INNER JOIN clientes c ON r.id_cliente = c.id_cliente
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
@@ -58,6 +61,7 @@ $stmt = $db->prepare("
 ");
 $stmt->execute([$idReservacion]);
 $guiasActuales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$guiasSeleccionadosIds = array_map('intval', array_column($guiasActuales, 'id_guia'));
 
 $errores = [];
 $guiasSugeridos = [];
@@ -71,6 +75,55 @@ try {
         $reservacion['idioma'],
         $reservacion['num_guias_requeridos']
     );
+    
+    if (!empty($guiasSeleccionadosIds)) {
+        $idsSugeridos = array_map('intval', array_column($guiasSugeridos, 'id_guia'));
+        $idsFaltantes = array_diff($guiasSeleccionadosIds, $idsSugeridos);
+        
+        if (!empty($idsFaltantes)) {
+            $placeholders = implode(',', array_fill(0, count($idsFaltantes), '?'));
+            $params = array_merge(
+                [
+                    $reservacion['fecha_reservacion'],
+                    $reservacion['hora_inicio'],
+                    $reservacion['idioma']
+                ],
+                $idsFaltantes
+            );
+            
+            $extraStmt = $db->prepare("
+                SELECT g.*,
+                       GROUP_CONCAT(DISTINCT gi.idioma SEPARATOR ', ') as idiomas,
+                       CASE 
+                           WHEN EXISTS (
+                               SELECT 1 
+                               FROM asignacion_guias ag2
+                               INNER JOIN reservaciones r2 ON ag2.id_reservacion = r2.id_reservacion
+                               WHERE ag2.id_guia = g.id_guia
+                               AND r2.fecha_tour = ?
+                               AND r2.hora_inicio = ?
+                               AND r2.estado IN ('confirmada','pagada')
+                           ) THEN 0
+                           ELSE 1
+                       END AS disponible,
+                       CASE WHEN EXISTS (
+                           SELECT 1
+                           FROM guia_idiomas gi2
+                           WHERE gi2.id_guia = g.id_guia
+                           AND gi2.idioma = ?
+                       ) THEN 1 ELSE 0 END AS preferido
+                FROM guias g
+                INNER JOIN usuarios u ON g.id_usuario = u.id_usuario
+                LEFT JOIN guia_idiomas gi ON g.id_guia = gi.id_guia
+                WHERE g.id_guia IN ($placeholders)
+                GROUP BY g.id_guia
+            ");
+            
+            $extraStmt->execute($params);
+            $guiasExtra = $extraStmt->fetchAll(PDO::FETCH_ASSOC);
+            $guiasSugeridos = array_merge($guiasExtra, $guiasSugeridos);
+        }
+    }
 } catch (Exception $e) {
     $errores[] = 'Error al obtener guías sugeridos: ' . $e->getMessage();
 }
@@ -87,6 +140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Validar que los IDs sean numéricos
             $idsGuias = array_map('intval', $idsGuias);
+            $maxGuiasPermitidos = (int)$reservacion['num_guias_requeridos'];
+            
+            if (count($idsGuias) > $maxGuiasPermitidos) {
+                $errores[] = 'No puede asignar más guías de los requeridos para esta reservación.';
+            }
             
             if (empty($errores)) {
                 try {
@@ -95,6 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([$idReservacion]);
                     
                     // Crear nuevas asignaciones usando la API
+                    $sessionCookie = session_name() . '=' . session_id();
+                    $sessionClosed = false;
+                    if (session_status() === PHP_SESSION_ACTIVE) {
+                        session_write_close();
+                        $sessionClosed = true;
+                    }
+
                     $ch = curl_init(SITE_URL . '/api/admin/asignar-guias.php');
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch, CURLOPT_POST, true);
@@ -104,12 +169,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]));
                     curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
-                        'Cookie: ' . session_name() . '=' . session_id()
+                        'Cookie: ' . $sessionCookie
                     ]);
                     
                     $response = curl_exec($ch);
                     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                     curl_close($ch);
+
+                    if ($sessionClosed) {
+                        session_start();
+                    }
                     
                     if ($httpCode === 200) {
                         $_SESSION['mensaje'] = 'Guías asignados correctamente. Se han enviado las notificaciones.';
@@ -179,6 +248,9 @@ $pageTitle = 'Asignar Guías';
             top: 10px;
             right: 10px;
         }
+        .guia-phone {
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -191,7 +263,7 @@ $pageTitle = 'Asignar Guías';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-user-plus"></i> Asignar Guías
+                        Asignar Guías
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <a href="detalle.php?id=<?php echo $idReservacion; ?>" class="btn btn-outline-secondary">
@@ -216,7 +288,6 @@ $pageTitle = 'Asignar Guías';
                 <div class="card shadow mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-ticket-alt"></i> 
                             Reservación: <?php echo htmlspecialchars($reservacion['codigo_reservacion']); ?>
                         </h5>
                     </div>
@@ -245,7 +316,6 @@ $pageTitle = 'Asignar Guías';
                         </div>
                         <hr>
                         <div class="alert alert-info mb-0">
-                            <i class="fas fa-info-circle"></i>
                             <strong>Guías requeridos:</strong> <?php echo $reservacion['num_guias_requeridos']; ?>
                             <?php if (!empty($guiasActuales)): ?>
                                 | <strong>Guías actualmente asignados:</strong> <?php echo count($guiasActuales); ?>
@@ -286,19 +356,24 @@ $pageTitle = 'Asignar Guías';
                     <div class="card shadow mb-4">
                         <div class="card-header bg-warning">
                             <h5 class="mb-0">
-                                <i class="fas fa-hand-pointer"></i> Seleccionar Guías
+                                Seleccionar Guías
                             </h5>
                         </div>
                         <div class="card-body">
                             <p class="mb-3">
-                                <i class="fas fa-info-circle text-primary"></i>
+
                                 Haga clic en las tarjetas para seleccionar los guías. 
                                 Los guías <span class="badge bg-warning">destacados</span> están disponibles y hablan el idioma requerido.
                             </p>
+                            <?php if (!empty($guiasActuales)): ?>
+                                <div class="alert alert-warning d-flex align-items-center">
+                                    <i class="fas fa-envelope-open-text me-2"></i>
+                                    <span>Al quitar o cambiar un guía se enviará un nuevo correo al cliente con la actualización.</span>
+                                </div>
+                            <?php endif; ?>
                             
                             <?php if (empty($guiasSugeridos)): ?>
                                 <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
                                     No hay guías disponibles para esta fecha y hora.
                                     Puede seleccionar manualmente de la lista de todos los guías activos.
                                 </div>
@@ -306,18 +381,23 @@ $pageTitle = 'Asignar Guías';
                             
                             <div class="row" id="guiasContainer">
                                 <?php foreach ($guiasSugeridos as $guia): ?>
+                                <?php 
+                                    $esPreferido = !empty($guia['preferido']);
+                                    $estaDisponible = isset($guia['disponible']) ? (bool)$guia['disponible'] : true;
+                                    $estaAsignado = in_array((int)$guia['id_guia'], $guiasSeleccionadosIds, true);
+                                ?>
                                 <div class="col-md-6">
-                                    <div class="guia-card position-relative <?php echo $guia['preferido'] ? 'sugerido' : ''; ?> <?php echo !$guia['disponible'] ? 'ocupado' : ''; ?>"
+                                    <div class="guia-card position-relative <?php echo $esPreferido ? 'sugerido' : ''; ?> <?php echo !$estaDisponible ? 'ocupado' : ''; ?> <?php echo $estaAsignado ? 'selected' : ''; ?>"
                                          data-id-guia="<?php echo $guia['id_guia']; ?>"
                                          onclick="toggleGuia(this)">
                                         
-                                        <?php if ($guia['preferido']): ?>
+                                        <?php if ($esPreferido): ?>
                                         <span class="badge bg-warning badge-sugerido">
                                             <i class="fas fa-star"></i> Sugerido
                                         </span>
                                         <?php endif; ?>
                                         
-                                        <?php if (!$guia['disponible']): ?>
+                                        <?php if (!$estaDisponible): ?>
                                         <span class="badge bg-danger badge-sugerido">
                                             <i class="fas fa-times"></i> Ocupado
                                         </span>
@@ -339,19 +419,22 @@ $pageTitle = 'Asignar Guías';
                                                 <h6 class="mb-1"><?php echo htmlspecialchars($guia['nombre_completo']); ?></h6>
                                                 <p class="mb-1">
                                                     <i class="fas fa-phone text-success"></i>
-                                                    <small><?php echo htmlspecialchars($guia['telefono']); ?></small>
+                                                    <span class="guia-phone"><?php echo htmlspecialchars($guia['telefono']); ?></span>
                                                 </p>
-                                                <p class="mb-1">
-                                                    <small>
-                                                        <?php 
-                                                        $idiomas = explode(', ', $guia['idiomas']);
-                                                        foreach ($idiomas as $idioma): 
-                                                        ?>
-                                                            <span class="badge bg-info me-1"><?php echo ucfirst($idioma); ?></span>
-                                                        <?php endforeach; ?>
-                                                    </small>
+                                                <p class="mb-2">
+                                                    <?php 
+                                                    $idiomas = !empty($guia['idiomas'])
+                                                        ? array_filter(preg_split('/\s*,\s*/', trim($guia['idiomas'])))
+                                                        : [];
+                                                    if ($idiomas):
+                                                        foreach ($idiomas as $idioma): ?>
+                                                            <span class="badge bg-info text-dark fs-6 me-2 d-inline-block"><?php echo ucfirst($idioma); ?></span>
+                                                        <?php endforeach;
+                                                    else: ?>
+                                                        <span class="text-muted">Sin idiomas registrados</span>
+                                                    <?php endif; ?>
                                                 </p>
-                                                <?php if (!$guia['disponible']): ?>
+                                                <?php if (!$estaDisponible): ?>
                                                 <p class="mb-0">
                                                     <small class="text-danger">
                                                         <i class="fas fa-exclamation-circle"></i>
@@ -365,7 +448,8 @@ $pageTitle = 'Asignar Guías';
                                                        name="guias[]" 
                                                        value="<?php echo $guia['id_guia']; ?>"
                                                        class="form-check-input guia-checkbox"
-                                                       style="width: 25px; height: 25px;">
+                                                       style="width: 25px; height: 25px;"
+                                                       <?php echo $estaAsignado ? 'checked' : ''; ?>>
                                             </div>
                                         </div>
                                     </div>
@@ -406,10 +490,10 @@ $pageTitle = 'Asignar Guías';
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <p class="mb-0">
-                                        <strong>Guías seleccionados:</strong> 
-                                        <span id="contadorGuias" class="badge bg-primary">0</span> / 
-                                        <span class="badge bg-secondary"><?php echo $reservacion['num_guias_requeridos']; ?> requeridos</span>
+                                    <p class="mb-0 fs-4">
+                                        <strong>Guías seleccionados:</strong>
+                                        <span id="contadorGuias" class="badge bg-primary fs-5">0</span> /
+                                        <span class="badge bg-secondary fs-6"><?php echo $reservacion['num_guias_requeridos']; ?> requeridos</span>
                                     </p>
                                 </div>
                                 <div>
@@ -433,13 +517,35 @@ $pageTitle = 'Asignar Guías';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+    const GUIAS_REQUERIDOS = <?php echo (int)$reservacion['num_guias_requeridos']; ?>;
+    const MENSAJE_LIMITE = GUIAS_REQUERIDOS === 1
+        ? 'Este tour solo necesita asignar un guía.'
+        : `Este tour solo necesita asignar hasta ${GUIAS_REQUERIDOS} guías.`;
+
+    function limiteAlcanzado() {
+        if (GUIAS_REQUERIDOS <= 0) {
+            return false;
+        }
+        return document.querySelectorAll('input[name="guias[]"]:checked').length >= GUIAS_REQUERIDOS;
+    }
+
     function toggleGuia(card) {
         const checkbox = card.querySelector('.guia-checkbox');
-        if (checkbox) {
-            checkbox.checked = !checkbox.checked;
-            updateCardState(card, checkbox.checked);
-            actualizarContador();
+        if (!checkbox) {
+            return;
         }
+
+        if (!checkbox.checked) {
+            if (limiteAlcanzado()) {
+                alert(MENSAJE_LIMITE);
+                return;
+            }
+            checkbox.checked = true;
+        } else {
+            checkbox.checked = false;
+        }
+        updateCardState(card, checkbox.checked);
+        actualizarContador();
     }
     
     function updateCardState(card, selected) {
@@ -459,6 +565,15 @@ $pageTitle = 'Asignar Guías';
     document.querySelectorAll('.guia-checkbox').forEach(function(checkbox) {
         checkbox.addEventListener('click', function(e) {
             e.stopPropagation();
+            if (this.checked && GUIAS_REQUERIDOS > 0) {
+                const seleccionados = document.querySelectorAll('input[name="guias[]"]:checked').length;
+                if (seleccionados > GUIAS_REQUERIDOS) {
+                    alert(MENSAJE_LIMITE);
+                    this.checked = false;
+                    e.preventDefault();
+                    return;
+                }
+            }
             const card = this.closest('.guia-card');
             updateCardState(card, this.checked);
             actualizarContador();

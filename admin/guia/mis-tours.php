@@ -29,8 +29,10 @@ $idGuia = $guia['id_guia'];
 // Obtener tours asignados (próximos y recientes)
 $stmt = $db->prepare("
     SELECT r.*, 
-           p.nombre as paquete_nombre, p.duracion,
-           c.nombre as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono,
+           p.nombre_paquete AS paquete_nombre,
+           ROUND(p.duracion_horas * 60) AS duracion,
+           r.fecha_tour AS fecha_reservacion,
+           c.nombre_completo AS cliente_nombre, c.email AS cliente_email, c.telefono AS cliente_telefono,
            ag.fecha_asignacion,
            (SELECT COUNT(*) FROM asignacion_guias ag2 WHERE ag2.id_reservacion = r.id_reservacion) as num_guias
     FROM asignacion_guias ag
@@ -38,8 +40,8 @@ $stmt = $db->prepare("
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
     INNER JOIN clientes c ON r.id_cliente = c.id_cliente
     WHERE ag.id_guia = ?
-      AND r.fecha_reservacion >= CURDATE() - INTERVAL 7 DAY
-    ORDER BY r.fecha_reservacion DESC, r.hora_inicio DESC
+      AND r.fecha_tour >= CURDATE() - INTERVAL 7 DAY
+    ORDER BY r.fecha_tour DESC, r.hora_inicio DESC
 ");
 $stmt->execute([$idGuia]);
 $tours = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -51,10 +53,10 @@ $toursCancelados = array_filter($tours, fn($t) => $t['estado'] === 'cancelada');
 
 // Obtener estadísticas del guía
 $stmt = $db->prepare("
-    SELECT 
+    SELECT
         COUNT(*) as total_tours,
-        SUM(r.numero_personas) as total_personas,
-        COUNT(DISTINCT DATE(r.fecha_reservacion)) as dias_trabajados
+        COALESCE(SUM(r.numero_personas), 0) as total_personas,
+        COUNT(DISTINCT DATE(r.fecha_tour)) as dias_trabajados
     FROM asignacion_guias ag
     INNER JOIN reservaciones r ON ag.id_reservacion = r.id_reservacion
     WHERE ag.id_guia = ? AND r.estado = 'completada'
@@ -77,7 +79,7 @@ $pageTitle = 'Mis Tours';
     
     <style>
         .tour-card {
-            border-left: 4px solid #0066cc;
+            border: 1px solid #0066cc;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .tour-card:hover {
@@ -85,15 +87,15 @@ $pageTitle = 'Mis Tours';
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .tour-card.completado {
-            border-left-color: #28a745;
+            border-color: #28a745;
             opacity: 0.9;
         }
         .tour-card.cancelado {
-            border-left-color: #dc3545;
+            border-color: #dc3545;
             opacity: 0.7;
         }
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #764ba2;
             color: white;
             border-radius: 10px;
             padding: 20px;
@@ -110,7 +112,7 @@ $pageTitle = 'Mis Tours';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-route"></i> Mis Tours Asignados
+                        Mis Tours Asignados
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <span class="badge bg-primary fs-6">
@@ -141,14 +143,14 @@ $pageTitle = 'Mis Tours';
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card text-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="stat-card text-center" style="background: #f5576c;">
                             <i class="fas fa-users fa-2x mb-2"></i>
                             <h3><?php echo number_format($estadisticas['total_personas']); ?></h3>
                             <p class="mb-0">Personas Atendidas</p>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="stat-card text-center" style="background: #00bcd4;">
                             <i class="fas fa-calendar-day fa-2x mb-2"></i>
                             <h3><?php echo number_format($estadisticas['dias_trabajados']); ?></h3>
                             <p class="mb-0">Días Trabajados</p>
@@ -160,7 +162,7 @@ $pageTitle = 'Mis Tours';
                 <div class="card shadow mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-calendar-alt"></i> Tours Próximos
+                            Tours Próximos
                             <span class="badge bg-light text-dark"><?php echo count($toursProximos); ?></span>
                         </h5>
                     </div>
@@ -284,7 +286,7 @@ $pageTitle = 'Mis Tours';
                 <div class="card shadow mb-4">
                     <div class="card-header bg-danger text-white">
                         <h5 class="mb-0">
-                            <i class="fas fa-times-circle"></i> Tours Cancelados
+                            Tours Cancelados
                             <span class="badge bg-light text-dark"><?php echo count($toursCancelados); ?></span>
                         </h5>
                     </div>

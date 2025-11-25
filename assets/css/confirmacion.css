@@ -1,8 +1,12 @@
 /* ====== SECCIÓN DE CONFIRMACIÓN ====== */
 .confirmation-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-image: url('../img/Ticket.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     min-height: 100vh;
-    padding: 50px 0;
+    padding: 20px 0;
 }
 
 /* ====== MENSAJE DE ÉXITO ====== */
@@ -50,7 +54,7 @@
 
 /* ====== HEADER DEL TICKET ====== */
 .ticket-header {
-    background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+    background: rgba(0, 94, 255, 0.995);
     color: white;
     /* 🔧 AJUSTABLE: Padding del header */
     padding: 30px;
@@ -269,6 +273,35 @@
     line-height: 1.6;
 }
 
+/* ====== BOTONES DE ACCIÓN PERSONALIZADOS ====== */
+.btn-download-pdf {
+    background-color: #fd7e14;
+    /* Naranja */
+    border-color: #fd7e14;
+    color: white;
+}
+
+.btn-download-pdf:hover {
+    background-color: #e66a00;
+    /* Naranja más oscuro */
+    border-color: #e66a00;
+    color: white;
+}
+
+.btn-home {
+    background-color: #198754;
+    /* Verde */
+    border-color: #198754;
+    color: white;
+}
+
+.btn-home:hover {
+    background-color: #157347;
+    /* Verde más oscuro */
+    border-color: #157347;
+    color: white;
+}
+
 /* ====== ANIMACIONES ====== */
 @keyframes scaleIn {
     from {
@@ -330,7 +363,7 @@
 /* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
     .confirmation-section {
-        padding: 30px 15px;
+        padding: 15px 15px;
     }
 
     .success-icon {

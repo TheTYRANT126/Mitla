@@ -11,8 +11,10 @@ if (!$auth->isAuthenticated() || !$auth->isAdmin()) {
     redirect(SITE_URL . '/admin/login.php');
 }
 
+$mostrarSoloActivos = isset($_GET['mostrar']) ? ($_GET['mostrar'] !== 'todos') : true;
+
 $guiaClass = new Guia();
-$guias = $guiaClass->obtenerTodos();
+$guias = $guiaClass->obtenerTodos($mostrarSoloActivos);
 
 $pageTitle = 'Gestión de Guías';
 ?>
@@ -30,6 +32,28 @@ $pageTitle = 'Gestión de Guías';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     
     <link rel="stylesheet" href="<?php echo ASSETS_URL; ?>/css/admin/admin.css">
+    <style>
+        .btn-activos {
+            background-color: #fff;
+            color: #198754;
+            border: 1px solid #58CD3D;
+        }
+        .btn-activos:hover {
+            background-color: #58CD3D;
+            color: #000;
+        }
+        .btn-activos-active {
+            background-color: #58CD3D;
+            color: #000;
+            border: none;
+            box-shadow: none;
+            font-weight: 600;
+        }
+        .btn-activos-active:hover {
+            background-color: #4BB034;
+            color: #000;
+        }
+    </style>
 </head>
 <body>
     <?php include __DIR__ . '/../includes/header.php'; ?>
@@ -44,7 +68,15 @@ $pageTitle = 'Gestión de Guías';
                         Gestión de Guías
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <a href="crear.php" class="btn btn-primary">
+                        <div class="btn-group">
+                            <a href="?mostrar=activos" class="btn <?php echo $mostrarSoloActivos ? 'btn-activos-active' : 'btn-activos'; ?>">
+                                <i class="fa-solid fa-check"></i> Solo activos
+                            </a>
+                            <a href="?mostrar=todos" class="btn btn-<?php echo !$mostrarSoloActivos ? 'primary' : 'outline-primary'; ?>">
+                                <i class="fas fa-list"></i> Todos
+                            </a>
+                        </div>
+                        <a href="crear.php" class="btn btn-success ms-2">
                             <i class="fas fa-plus"></i> Registrar Nuevo Guía
                         </a>
                     </div>
@@ -159,7 +191,20 @@ $pageTitle = 'Gestión de Guías';
     $(document).ready(function() {
         $('#guiasTable').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-MX.json'
+                decimal: ",",
+                thousands: ".",
+                lengthMenu: "Mostrar _MENU_ registros",
+                zeroRecords: "No se encontraron resultados",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                infoFiltered: "(filtrado de _MAX_ registros totales)",
+                search: "Buscar:",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
             },
             order: [[1, 'asc']],
             pageLength: 25

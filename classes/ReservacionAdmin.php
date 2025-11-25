@@ -11,9 +11,12 @@ class ReservacionAdmin {
      * Obtener todas las reservaciones con filtros
      */
     public function obtenerTodas($filtros = []) {
-        $sql = "SELECT r.*, 
-                       c.nombre_completo, c.email,
-                       p.nombre_paquete,
+        $sql = "SELECT r.*,
+                       c.nombre_completo AS cliente_nombre,
+                       c.email,
+                       p.nombre_paquete AS paquete_nombre,
+                       r.fecha_tour AS fecha_reservacion,
+                       r.total AS monto_total,
                        COUNT(DISTINCT ag.id_guia) as guias_asignados
                 FROM reservaciones r
                 INNER JOIN clientes c ON r.id_cliente = c.id_cliente
@@ -117,10 +120,16 @@ class ReservacionAdmin {
     /**
      * Asignar guías a una reservación
      */
-    public function asignarGuias($idReservacion, $idsGuias) {
+    public function asignarGuias($idReservacion, $idsGuias, $usuarioId = null) {
         try {
             $this->db->beginTransaction();
             
+            $reservaActual = $this->db->fetchOne(
+                "SELECT estado FROM reservaciones WHERE id_reservacion = ?",
+                [$idReservacion]
+            );
+            $estadoAnterior = $reservaActual['estado'] ?? null;
+
             // Eliminar asignaciones anteriores
             $this->db->execute(
                 "DELETE FROM asignacion_guias WHERE id_reservacion = ?",
@@ -141,6 +150,31 @@ class ReservacionAdmin {
                 "UPDATE reservaciones SET estado = 'confirmada' WHERE id_reservacion = ?",
                 [$idReservacion]
             );
+            
+            // Registrar en historial
+            if (!empty($idsGuias)) {
+                $placeholders = implode(',', array_fill(0, count($idsGuias), '?'));
+                $nombresGuias = $this->db->fetchAll(
+                    "SELECT nombre_completo FROM guias WHERE id_guia IN ($placeholders)",
+                    $idsGuias
+                );
+                $listaGuias = array_column($nombresGuias, 'nombre_completo');
+                $motivo = !empty($listaGuias)
+                    ? 'Se asignaron los guías: ' . implode(', ', $listaGuias)
+                    : 'Se actualizaron las asignaciones de guías.';
+                
+                $this->db->insert(
+                    "INSERT INTO historial_estados (id_reservacion, estado_anterior, estado_nuevo, motivo, fecha_cambio, cambiado_por)
+                     VALUES (?, ?, ?, ?, NOW(), ?)",
+                    [
+                        $idReservacion,
+                        $estadoAnterior,
+                        'Asignación de guías',
+                        $motivo,
+                        $usuarioId
+                    ]
+                );
+            }
             
             $this->db->commit();
             

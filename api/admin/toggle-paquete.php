@@ -30,8 +30,8 @@ $activo = intval($data['activo']);
 try {
     $paqueteClass = new PaqueteAdmin();
     $resultado = $paqueteClass->cambiarEstado($idPaquete, $activo);
-    
-    if ($resultado) {
+
+    if ($resultado['success']) {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("
             INSERT INTO audit_log (id_usuario, accion, tabla_afectada, registro_id, ip, user_agent)
@@ -44,15 +44,19 @@ try {
             $_SERVER['REMOTE_ADDR'],
             $_SERVER['HTTP_USER_AGENT'] ?? ''
         ]);
-        
+
         echo json_encode([
             'success' => true,
-            'message' => $activo ? 'Paquete activado correctamente' : 'Paquete desactivado correctamente'
+            'message' => $resultado['message']
         ]);
     } else {
-        throw new Exception('No se pudo cambiar el estado del paquete');
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => $resultado['message']
+        ]);
     }
-    
+
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([

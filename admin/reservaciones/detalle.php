@@ -22,10 +22,13 @@ $db = Database::getInstance()->getConnection();
 
 // Obtener reservación completa
 $stmt = $db->prepare("
-    SELECT r.*, 
-           c.nombre as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono,
-           p.nombre as paquete_nombre, p.descripcion as paquete_descripcion,
-           p.duracion, p.max_personas
+    SELECT r.*,
+           r.fecha_tour as fecha_reservacion,
+           r.idioma_tour as idioma,
+           r.total as monto_total,
+           c.nombre_completo as cliente_nombre, c.email as cliente_email, c.telefono as cliente_telefono,
+           p.nombre_paquete as paquete_nombre, p.descripcion_es as paquete_descripcion,
+           p.duracion_horas as duracion, p.capacidad_maxima as max_personas
     FROM reservaciones r
     INNER JOIN clientes c ON r.id_cliente = c.id_cliente
     INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
@@ -98,6 +101,50 @@ $stmt = $db->prepare("
 $stmt->execute([$idReservacion]);
 $observaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Obtener participantes para información médica
+$stmt = $db->prepare("
+    SELECT nombre_completo, alergias, condiciones_medicas
+    FROM participantes
+    WHERE id_reservacion = ?
+    ORDER BY id_participante ASC
+");
+$stmt->execute([$idReservacion]);
+$participantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$fechaCreacionFormatted = !empty($reservacion['fecha_creacion'])
+    ? date('d/m/Y H:i', strtotime($reservacion['fecha_creacion']))
+    : 'Sin fecha';
+
+$fechaReservacionFormatted = !empty($reservacion['fecha_reservacion'])
+    ? date('d/m/Y', strtotime($reservacion['fecha_reservacion']))
+    : 'Sin fecha';
+
+$horaInicioFormatted = !empty($reservacion['hora_inicio'])
+    ? date('H:i', strtotime($reservacion['hora_inicio']))
+    : '--:--';
+
+$idiomaRequerido = !empty($reservacion['idioma'])
+    ? ucfirst($reservacion['idioma'])
+    : 'No especificado';
+
+$montoTotalFormatted = number_format((float)($reservacion['monto_total'] ?? 0), 2);
+$notasAdmin = $reservacion['notas_admin'] ?? '';
+$clienteNombre = $reservacion['cliente_nombre'] ?? 'Cliente sin nombre';
+$clienteEmail = $reservacion['cliente_email'] ?? '';
+$informacionMedica = [];
+$guiasAsignadosTotal = count($guiasAgrupados);
+$guiasRequeridos = max(1, (int)ceil(($reservacion['numero_personas'] ?? 0) / 5));
+
+foreach ($participantes as $index => $participante) {
+    $alergiasTexto = trim((string)($participante['alergias'] ?? ''));
+    $condicionesTexto = trim((string)($participante['condiciones_medicas'] ?? ''));
+    $informacionMedica[] = [
+        'nombre' => $participante['nombre_completo'] ?: 'Participante ' . ($index + 1),
+        'alergias' => $alergiasTexto,
+        'condiciones' => $condicionesTexto
+    ];
+}
+
 $pageTitle = 'Detalle de Reservación';
 ?>
 <!DOCTYPE html>
@@ -147,6 +194,34 @@ $pageTitle = 'Detalle de Reservación';
             padding: 15px;
             margin-bottom: 15px;
         }
+        .guia-card h6 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .guia-contact {
+            font-size: 1.05rem;
+        }
+        .badge-large {
+            font-size: 1rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 999px;
+        }
+        .badge-idioma {
+            font-size: 1.1rem;
+            padding: 0.5rem 1.3rem;
+        }
+        .tour-info-text p {
+            font-size: 1.35rem;
+            line-height: 1.5;
+        }
+        .cliente-card-body {
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+        .cliente-card-body h6 {
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -159,7 +234,7 @@ $pageTitle = 'Detalle de Reservación';
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">
-                        <i class="fas fa-ticket-alt"></i> Reservación 
+                        Reservación 
                         <span class="text-primary"><?php echo htmlspecialchars($reservacion['codigo_reservacion']); ?></span>
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
@@ -176,20 +251,20 @@ $pageTitle = 'Detalle de Reservación';
                             <ul class="dropdown-menu">
                                 <?php if ($reservacion['estado'] === 'pendiente'): ?>
                                 <li><a class="dropdown-item" href="#" onclick="cambiarEstado('confirmada')">
-                                    <i class="fas fa-check text-info"></i> Confirmar
+                                    Confirmar
                                 </a></li>
                                 <?php endif; ?>
                                 
                                 <?php if ($reservacion['estado'] === 'confirmada' || $reservacion['estado'] === 'pendiente'): ?>
                                 <li><a class="dropdown-item" href="#" onclick="cambiarEstado('pagada')">
-                                    <i class="fas fa-dollar-sign text-success"></i> Marcar como Pagada
+                                    Marcar como Pagada
                                 </a></li>
                                 <?php endif; ?>
                                 
                                 <?php if ($reservacion['estado'] !== 'cancelada' && $reservacion['estado'] !== 'completada'): ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="#" onclick="cancelarReservacion()">
-                                    <i class="fas fa-times-circle"></i> Cancelar Reservación
+                                    Cancelar Reservación
                                 </a></li>
                                 <?php endif; ?>
                             </ul>
@@ -222,13 +297,12 @@ $pageTitle = 'Detalle de Reservación';
                         ?> d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-0">
-                                    <i class="fas fa-info-circle"></i> 
                                     Estado: <strong><?php echo ucfirst($reservacion['estado']); ?></strong>
                                 </h5>
                             </div>
                             <div>
-                                <span class="badge bg-dark">
-                                    Creada: <?php echo date('d/m/Y H:i', strtotime($reservacion['fecha_creacion'])); ?>
+                                <span class="badge bg-dark badge-large">
+                                    Creada: <?php echo $fechaCreacionFormatted; ?>
                                 </span>
                             </div>
                         </div>
@@ -236,37 +310,37 @@ $pageTitle = 'Detalle de Reservación';
                         <!-- Información del Tour -->
                         <div class="card shadow mb-4">
                             <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0"><i class="fas fa-map-marked-alt"></i> Información del Tour</h5>
+                                <h5 class="mb-0">Información del Tour</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body tour-info-text">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p><strong>Paquete:</strong><br>
                                         <?php echo htmlspecialchars($reservacion['paquete_nombre']); ?></p>
                                         
                                         <p><strong>Fecha:</strong><br>
-                                        <i class="fas fa-calendar"></i> <?php echo date('d/m/Y', strtotime($reservacion['fecha_reservacion'])); ?></p>
+                                        <?php echo $fechaReservacionFormatted; ?></p>
                                         
                                         <p><strong>Hora:</strong><br>
-                                        <i class="fas fa-clock"></i> <?php echo date('H:i', strtotime($reservacion['hora_inicio'])); ?> 
+                                        <?php echo $horaInicioFormatted; ?> 
                                         (<?php echo $reservacion['duracion']; ?> minutos)</p>
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Número de Personas:</strong><br>
-                                        <i class="fas fa-users"></i> <?php echo $reservacion['numero_personas']; ?> / <?php echo $reservacion['max_personas']; ?></p>
+                                        <?php echo $reservacion['numero_personas']; ?> / <?php echo $reservacion['max_personas']; ?></p>
                                         
                                         <p><strong>Idioma Requerido:</strong><br>
-                                        <span class="badge bg-info"><?php echo ucfirst($reservacion['idioma']); ?></span></p>
+                                        <span class="badge bg-info badge-idioma"><?php echo $idiomaRequerido; ?></span></p>
                                         
                                         <p><strong>Monto Total:</strong><br>
-                                        <span class="h4 text-success">$<?php echo number_format($reservacion['monto_total'], 2); ?></span></p>
+                                        <span class="h4 text-success">$<?php echo $montoTotalFormatted; ?></span></p>
                                     </div>
                                 </div>
                                 
-                                <?php if ($reservacion['notas_admin']): ?>
+                                <?php if (!empty($notasAdmin)): ?>
                                 <hr>
                                 <p><strong>Notas del Administrador:</strong><br>
-                                <?php echo nl2br(htmlspecialchars($reservacion['notas_admin'])); ?></p>
+                                <?php echo nl2br(htmlspecialchars($notasAdmin)); ?></p>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -274,10 +348,15 @@ $pageTitle = 'Detalle de Reservación';
                         <!-- Guías Asignados -->
                         <div class="card shadow mb-4">
                             <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-user-tie"></i> Guías Asignados 
-                                    <span class="badge bg-light text-dark"><?php echo count($guiasAgrupados); ?></span>
-                                </h5>
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                                    <h5 class="mb-0">
+                                        Guías Asignados 
+                                        <span class="badge bg-light text-dark"><?php echo $guiasAsignadosTotal; ?></span>
+                                    </h5>
+                                    <h5 class="mb-0 mt-2 mt-md-0 text-white">
+                                        Se necesitan (<?php echo $guiasRequeridos; ?>) guía<?php echo $guiasRequeridos === 1 ? '' : 's'; ?>
+                                    </h5>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($guiasAgrupados)): ?>
@@ -302,11 +381,11 @@ $pageTitle = 'Detalle de Reservación';
                                                 </h6>
                                                 <p class="mb-1">
                                                     <i class="fas fa-envelope text-primary"></i> 
-                                                    <small><?php echo htmlspecialchars($guia['email']); ?></small>
+                                                    <span class="guia-contact"><?php echo htmlspecialchars($guia['email']); ?></span>
                                                 </p>
                                                 <p class="mb-1">
                                                     <i class="fas fa-phone text-success"></i> 
-                                                    <small><?php echo htmlspecialchars($guia['telefono']); ?></small>
+                                                    <span class="guia-contact"><?php echo htmlspecialchars($guia['telefono']); ?></span>
                                                 </p>
                                                 <div>
                                                     <?php foreach ($guia['idiomas'] as $idioma): ?>
@@ -384,30 +463,57 @@ $pageTitle = 'Detalle de Reservación';
                     <div class="col-md-4">
                         <!-- Información del Cliente -->
                         <div class="card shadow mb-4">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0"><i class="fas fa-user"></i> Cliente</h5>
+                            <div class="card-header" style="background-color: #f8c5d3; color: #5a1f3d;">
+                                <h5 class="mb-0"> Cliente</h5>
                             </div>
-                            <div class="card-body">
-                                <h6><?php echo htmlspecialchars($reservacion['cliente_nombre']); ?></h6>
+                            <div class="card-body cliente-card-body">
+                                <h6><?php echo htmlspecialchars($clienteNombre); ?></h6>
                                 <p class="mb-1">
                                     <i class="fas fa-envelope"></i> 
-                                    <a href="mailto:<?php echo htmlspecialchars($reservacion['cliente_email']); ?>">
-                                        <?php echo htmlspecialchars($reservacion['cliente_email']); ?>
+                                    <?php if ($clienteEmail): ?>
+                                    <a href="mailto:<?php echo htmlspecialchars($clienteEmail); ?>">
+                                        <?php echo htmlspecialchars($clienteEmail); ?>
                                     </a>
+                                    <?php else: ?>
+                                    <span class="text-muted">Sin correo</span>
+                                    <?php endif; ?>
                                 </p>
-                                <p class="mb-0">
-                                    <i class="fas fa-phone"></i> 
-                                    <a href="tel:<?php echo htmlspecialchars($reservacion['cliente_telefono']); ?>">
-                                        <?php echo htmlspecialchars($reservacion['cliente_telefono']); ?>
-                                    </a>
-                                </p>
+                                <div class="mt-3">
+                                    <p class="mb-2">
+                                        <i class="fas fa-notes-medical text-danger"></i> 
+                                        <strong>Información médica de participantes</strong>
+                                    </p>
+                                    <?php if (!empty($informacionMedica)): ?>
+                                        <ul class="list-unstyled small mb-0">
+                                            <?php foreach ($informacionMedica as $info): ?>
+                                                <?php
+                                                $texto = trim(
+                                                    ($info['alergias'] !== '' ? $info['alergias'] : '') .
+                                                    ($info['condiciones'] !== '' 
+                                                        ? ($info['alergias'] !== '' ? ' ' : '') . $info['condiciones'] 
+                                                        : '')
+                                                );
+                                                ?>
+                                                <li class="mb-2">
+                                                    <?php if ($texto !== ''): ?>
+                                                        <?php echo nl2br(htmlspecialchars($texto)); ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">Sin detalles médicos</span>
+                                                    <?php endif; ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php else: ?>
+                                        <span class="text-muted small">Sin información médica proporcionada</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                         
                         <!-- Historial de Estados -->
                         <div class="card shadow mb-4">
                             <div class="card-header bg-warning">
-                                <h5 class="mb-0"><i class="fas fa-history"></i> Historial</h5>
+                                <h5 class="mb-0">Historial</h5>
                             </div>
                             <div class="card-body">
                                 <div class="timeline">
@@ -438,7 +544,7 @@ $pageTitle = 'Detalle de Reservación';
                         </div>
                         
                         <!-- Acciones Adicionales -->
-                        <?php if ($reservacion['estado'] === 'cancelada' && empty($reembolsos) && $reservacion['estado_pago'] === 'pagado'): ?>
+                        <?php if ($reservacion['estado'] === 'cancelada' && empty($reembolsos) && (($reservacion['estado_pago'] ?? '') === 'pagado')): ?>
                         <div class="card shadow mb-4 border-danger">
                             <div class="card-header bg-danger text-white">
                                 <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Acción Requerida</h5>

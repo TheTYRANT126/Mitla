@@ -131,7 +131,8 @@ $horarios = $db->fetchAll(
     <!-- Figura de Transición (Hexágono) -->
     <div class="transition-shape">
         <div class="hexagon">
-            <span>Información de paquete</span>
+            <span class="hexagon-label">Información de paquete</span>
+            <i class="fa-solid fa-arrow-down-long hexagon-arrow" aria-hidden="true"></i>
         </div>
     </div>
     
@@ -144,6 +145,20 @@ $horarios = $db->fetchAll(
         });
         $paquete_actual = reset($paquete_actual);
         $descripcion_campo = 'descripcion_' . $lang;
+        $detalles_extra = getPackageExtraDetails($paquete_actual['id_paquete']);
+        $plan_visita_texto = trim($detalles_extra['plan_visita']) !== ''
+            ? $detalles_extra['plan_visita']
+            : ($paquete_actual[$descripcion_campo] ?? '');
+        $mapa_personalizado = trim($detalles_extra['mapa_widget']);
+        $mapa_por_defecto = '';
+        if ($mapa_personalizado === '') {
+            if ($paquete_actual['id_paquete'] == 1) {
+                $mapa_por_defecto = 'https://es.wikiloc.com/wikiloc/embedv2.do?id=181194053&elevation=off&images=off&maptype=H';
+            } elseif ($paquete_actual['id_paquete'] == 2) {
+                $mapa_por_defecto = 'https://es.wikiloc.com/wikiloc/embedv2.do?id=97179823&elevation=off&images=off&maptype=H';
+            }
+        }
+        $mapa_embed_url = $mapa_personalizado !== '' ? $mapa_personalizado : $mapa_por_defecto;
         ?>
         
         <div class="container">
@@ -188,8 +203,33 @@ $horarios = $db->fetchAll(
                                 $horarios_mostrados[] = $key;
                             }
                         }
+
+                        $mapaDias = [
+                            'lunes' => 'los lunes',
+                            'martes' => 'los martes',
+                            'miercoles' => 'los miércoles',
+                            'jueves' => 'los jueves',
+                            'viernes' => 'los viernes',
+                            'sabado' => 'los sábados',
+                            'domingo' => 'los domingos'
+                        ];
+                        $diasConHorario = [];
+                        foreach ($horarios as $h) {
+                            if (!empty($h['dia_semana'])) {
+                                $diasConHorario[$h['dia_semana']] = true;
+                            }
+                        }
+                        $diasCerrados = array_diff(array_keys($mapaDias), array_keys($diasConHorario));
+                        if (!empty($diasCerrados)) {
+                            $frases = array_map(function($dia) use ($mapaDias) {
+                                return $mapaDias[$dia];
+                            }, $diasCerrados);
+                            $textoCerrado = count($frases) > 1
+                                ? implode(', ', array_slice($frases, 0, -1)) . ' y ' . end($frases)
+                                : $frases[0];
+                            echo '<p class="text-danger">Cerrado ' . $textoCerrado . '</p>';
+                        }
                         ?>
-                        <p class="text-danger">Cerrado los lunes</p>
                     </div>
                 </div>
                 
@@ -221,7 +261,7 @@ $horarios = $db->fetchAll(
                     </div>
                     <div class="info-content">
                         <h3>Plan de visita</h3>
-                        <p><?php echo htmlspecialchars($paquete_actual[$descripcion_campo]); ?></p>
+                        <p><?php echo nl2br(htmlspecialchars($plan_visita_texto)); ?></p>
                         <p>Duración aproximada: <?php echo $paquete_actual['duracion_horas']; ?> horas.</p>
                     </div>
                 </div>
@@ -283,7 +323,7 @@ $horarios = $db->fetchAll(
                     </div>
                     <div class="info-content">
                         <h3>Servicios ofrecidos</h3>
-                        <p>Visita guiada, interpretación cultural y natural, centro de visitantes con sanitarios, área de hidratación, módulos informativos y venta de artesanías locales.</p>
+                        <p><?php echo nl2br(htmlspecialchars($detalles_extra['servicios_ofrecidos'])); ?></p>
                     </div>
                 </div>
                 
@@ -295,7 +335,7 @@ $horarios = $db->fetchAll(
                     </div>
                     <div class="info-content">
                         <h3>Transporte</h3>
-                        <p>Acceso por carretera Mitla-Unión Zapata (aprox. 10 min). Transporte comunitario disponible desde Mitla. Estacionamiento limitado para autos particulares. Posibilidad de transporte contratado para grupos.</p>
+                        <p><?php echo nl2br(htmlspecialchars($detalles_extra['transporte'])); ?></p>
                     </div>
                 </div>
 
@@ -306,7 +346,7 @@ $horarios = $db->fetchAll(
                     </div>
                     <div class="info-content">
                         <h3>Infraestructura de visita</h3>
-                        <p>Senderos señalizados, áreas de descanso, barandales en puntos estratégicos, señalética bilingüe (español-inglés), Centro Interpretativo con sala de exposición y audiovisuales.</p>
+                        <p><?php echo nl2br(htmlspecialchars($detalles_extra['infraestructura'])); ?></p>
                     </div>
                 </div>
                 
@@ -318,7 +358,7 @@ $horarios = $db->fetchAll(
                     </div>
                     <div class="info-content">
                         <h3>Lugares cercanos de interés</h3>
-                        <p>Zona arqueológica de Mitla, Templo de San Pablo, Mercado de Mitla, Parador turístico de Hierve el Agua, talleres de textiles y mezcal en comunidades vecinas.</p>
+                        <p><?php echo nl2br(htmlspecialchars($detalles_extra['lugares_interes'])); ?></p>
                     </div>
                 </div>
 
@@ -329,7 +369,7 @@ $horarios = $db->fetchAll(
                     </div>
                     <div class="info-content">
                         <h3>Recomendaciones para visitantes</h3>
-                        <p>Ropa ligera y cómoda, calzado para caminata, sombrero o gorra, bloqueador solar biodegradable, agua personal reutilizable, repelente natural. No se permiten drones, bocinas o basura.</p>
+                        <p><?php echo nl2br(htmlspecialchars($detalles_extra['recomendaciones_visitantes'])); ?></p>
                     </div>
                 </div>
 
@@ -340,16 +380,16 @@ $horarios = $db->fetchAll(
             <div class="map-section text-center my-5">
                 <h3 class="mb-4">Mapa del Recorrido</h3>
                 <div class="map-widget-container">
-                    <?php if ($paquete_actual['id_paquete'] == 1): ?>
-                        <!-- Mapa para Cuevas de Unión Zapata -->
-                        <iframe frameBorder="0" scrolling="no" src="https://es.wikiloc.com/wikiloc/embedv2.do?id=181194053&elevation=off&images=off&maptype=H" width="100%" height="500"></iframe>
-                        <div style="color:#777;font-size:11px;line-height:16px;">Powered by <a style="color:#4C8C2B;font-size:11px;line-height:16px;" target="_blank" href="https://es.wikiloc.com">Wikiloc</a></div>
-                    <?php elseif ($paquete_actual['id_paquete'] == 2): ?>
-                        <!-- Mapa para Cuevas Prehistóricas de Mitla -->
-                        <iframe frameBorder="0" scrolling="no" src="https://es.wikiloc.com/wikiloc/embedv2.do?id=97179823&elevation=off&images=off&maptype=H" width="100%" height="500"></iframe>
-                        <div style="color:#777;font-size:11px;line-height:16px;">Powered by <a style="color:#4C8C2B;font-size:11px;line-height:16px;" target="_blank" href="https://es.wikiloc.com">Wikiloc</a></div>
+                    <?php if (!empty($mapa_embed_url)): ?>
+                        <iframe frameBorder="0" scrolling="no" src="<?php echo htmlspecialchars($mapa_embed_url, ENT_QUOTES, 'UTF-8'); ?>" width="100%" height="500"></iframe>
+                        <div style="color:#777;font-size:11px;line-height:16px;">Powered by <a style="color:#4C8C2B;font-size:11px;line-height:16px;" target="_blank" rel="noopener" href="https://es.wikiloc.com">Wikiloc</a></div>
+                    <?php else: ?>
+                        <p class="text-muted">Aún no se ha configurado el mapa de recorrido para este paquete.</p>
                     <?php endif; ?>
                 </div>
+                <p class="text-muted mt-3">
+                    Puedes crear o modificar la ruta del recorrido desde <a href="https://es.wikiloc.com/" target="_blank" rel="noopener">Wikiloc</a> y pegar aquí el nuevo enlace del widget.
+                </p>
             </div>
 
             <!-- Botón de Reservar -->

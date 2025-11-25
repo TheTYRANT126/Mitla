@@ -77,20 +77,20 @@ $pageTitle = 'Registro de Actividad';
     
     <style>
         .log-item {
-            border-left: 4px solid #0066cc;
+            border: 1px solid #0066cc;
             padding: 15px;
             margin-bottom: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
         }
         .log-item.success {
-            border-left-color: #28a745;
+            border-color: #28a745;
         }
         .log-item.danger {
-            border-left-color: #dc3545;
+            border-color: #dc3545;
         }
         .log-item.warning {
-            border-left-color: #ffc107;
+            border-color: #ffc107;
         }
         .json-viewer {
             background-color: #f4f4f4;
@@ -249,7 +249,6 @@ $pageTitle = 'Registro de Actividad';
                                 
                                 <?php if ($log['ip']): ?>
                                 <div class="mb-2">
-                                    <i class="fas fa-network-wired text-secondary"></i>
                                     <small>IP: <?php echo htmlspecialchars($log['ip']); ?></small>
                                 </div>
                                 <?php endif; ?>
