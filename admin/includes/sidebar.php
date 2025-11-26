@@ -61,7 +61,7 @@ $menuColors = $_SESSION['menu_colors'];
                    data-color="<?php echo $menuColors['dashboard']; ?>"
                    data-color-bg="<?php echo hexToRgba($menuColors['dashboard']); ?>">
                     <i class="fas fa-chart-line"></i>
-                    Dashboard
+                    Estadísticas
                 </a>
             </li>
 
