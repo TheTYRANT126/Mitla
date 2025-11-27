@@ -13,7 +13,12 @@ $logoUrl = ASSETS_URL . '/img/logo.png';
 ?>
 <!-- Navegación -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-    <div class="container">
+    <div class="container-fluid">
+        <!-- Botón toggle para sidebar en móvil -->
+        <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <a class="navbar-brand" href="<?php echo SITE_URL; ?>/admin/dashboard.php">
             <?php if (file_exists($logoPath)): ?>
                 <img src="<?php echo $logoUrl; ?>" alt="<?php echo SITE_NAME; ?>" class="navbar-logo">

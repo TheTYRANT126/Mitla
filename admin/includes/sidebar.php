@@ -171,20 +171,26 @@ $menuColors = $_SESSION['menu_colors'];
 </nav>
 
 <style>
+:root {
+    --navbar-height: 72px;
+}
+
 .sidebar {
     position: fixed;
-    top: 0;
+    top: var(--navbar-height, 72px);
     bottom: 0;
     left: 0;
     z-index: 100;
-    padding: 80px 0 0;
+    padding: 1rem 0 2rem;
+    height: calc(100vh - var(--navbar-height, 72px));
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background-color: #fff;
 }
 
 .sidebar-sticky {
     position: relative;
     top: 0;
-    height: calc(100vh - 80px);
+    height: calc(100vh - var(--navbar-height, 72px));
     padding-top: .5rem;
     overflow-x: hidden;
     overflow-y: auto;
@@ -208,29 +214,68 @@ $menuColors = $_SESSION['menu_colors'];
     text-transform: uppercase;
 }
 
+/* Estilos mejorados para móvil */
 @media (max-width: 767.98px) {
     .sidebar {
-        top: 90px;
+        padding: 1.25rem 0 2rem;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        width: 280px;
+        max-width: 80vw;
+        z-index: 1050;
+        height: calc(100vh - var(--navbar-height, 72px));
+    }
+
+    .sidebar.collapse:not(.show) {
+        display: none;
+    }
+
+    .sidebar.collapse.show {
+        display: block;
+    }
+
+    .sidebar ~ main {
+        margin-left: 0;
+    }
+}
+
+/* Para pantallas medianas y grandes */
+@media (min-width: 768px) {
+    .sidebar {
+        display: block !important;
     }
 }
 </style>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    const sidebar = document.getElementById('sidebarMenu');
+    const navbarNav = document.getElementById('navbarNav');
+    const sidebarToggle = document.querySelector('[data-bs-target="#sidebarMenu"]');
+    const navbarToggle = document.querySelector('[data-bs-target="#navbarNav"]');
+    const navbar = document.querySelector('.navbar');
+    const root = document.documentElement;
+
+    function updateSidebarOffset() {
+        if (!navbar) {
+            return;
+        }
+        root.style.setProperty('--navbar-height', `${navbar.offsetHeight}px`);
+    }
+
+    updateSidebarOffset();
 
     navLinks.forEach(link => {
         const color = link.getAttribute('data-color');
         const colorBg = link.getAttribute('data-color-bg');
 
-        // Aplicar estilos para elementos activos
         if (link.classList.contains('active')) {
             link.style.color = color;
             link.style.backgroundColor = colorBg;
             link.style.borderLeft = `3px solid ${color}`;
         }
 
-        // Hover: aplicar el color específico de cada elemento
         link.addEventListener('mouseenter', function() {
             this.style.color = color;
             this.style.backgroundColor = colorBg;
@@ -245,6 +290,73 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.backgroundColor = colorBg;
             }
         });
+
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 768) {
+                const bsCollapse = bootstrap.Collapse.getInstance(sidebar);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                }
+            }
+        });
+    });
+
+    function closeAllSidebars() {
+        if (sidebar) {
+            const sidebarCollapse = bootstrap.Collapse.getInstance(sidebar);
+            if (sidebarCollapse) {
+                sidebarCollapse.hide();
+            }
+        }
+        if (navbarNav) {
+            const navbarCollapse = bootstrap.Collapse.getInstance(navbarNav);
+            if (navbarCollapse) {
+                navbarCollapse.hide();
+            }
+        }
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            if (navbarNav && navbarNav.classList.contains('show')) {
+                const navbarCollapse = bootstrap.Collapse.getInstance(navbarNav);
+                if (navbarCollapse) {
+                    navbarCollapse.hide();
+                }
+            }
+        });
+    }
+
+    if (navbarToggle) {
+        navbarToggle.addEventListener('click', function() {
+            if (sidebar && sidebar.classList.contains('show')) {
+                const sidebarCollapse = bootstrap.Collapse.getInstance(sidebar);
+                if (sidebarCollapse) {
+                    sidebarCollapse.hide();
+                }
+            }
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth < 768) {
+            const isClickInsideSidebar = sidebar && sidebar.contains(event.target);
+            const isClickInsideNavbar = navbarNav && navbarNav.contains(event.target);
+            const isClickOnToggle = (sidebarToggle && sidebarToggle.contains(event.target)) ||
+                                    (navbarToggle && navbarToggle.contains(event.target));
+
+            if (!isClickInsideSidebar && !isClickInsideNavbar && !isClickOnToggle) {
+                closeAllSidebars();
+            }
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        updateSidebarOffset();
+        if (window.innerWidth >= 768) {
+            closeAllSidebars();
+        }
     });
 });
 </script>
+

@@ -28,12 +28,17 @@ $db = Database::getInstance()->getConnection();
 $stmt = $db->query("SELECT id_paquete, nombre_paquete AS nombre FROM paquetes WHERE activo = 1 ORDER BY nombre_paquete");
 $paquetes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$idPaqueteSeleccionado = intval($_GET['id_paquete'] ?? ($paquetes[0]['id_paquete'] ?? 0));
+// Por defecto, mostrar todos los paquetes (valor 0)
+$idPaqueteSeleccionado = isset($_GET['id_paquete']) ? intval($_GET['id_paquete']) : 0;
 
 $calendarioClass = new Calendario();
 $datosCalendario = [];
 
-if ($idPaqueteSeleccionado > 0) {
+// Si es 0, mostrar todos los paquetes (pasar null)
+// Si es mayor a 0, filtrar por ese paquete específico
+if ($idPaqueteSeleccionado === 0) {
+    $datosCalendario = $calendarioClass->obtenerMes($year, $month, null);
+} elseif ($idPaqueteSeleccionado > 0) {
     $datosCalendario = $calendarioClass->obtenerMes($year, $month, $idPaqueteSeleccionado);
 }
 
@@ -107,12 +112,33 @@ $pageTitle = 'Calendario de Disponibilidad';
             border-radius: 10px;
             margin-bottom: 20px;
         }
+        .calendar-header .calendar-nav .btn {
+            min-width: 110px;
+            flex: 1 1 auto;
+        }
         .legend-item {
             display: inline-block;
             margin-right: 20px;
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 0.9rem;
+        }
+        @media (max-width: 767.98px) {
+            .calendar-header .row > div {
+                text-align: center !important;
+                margin-bottom: 1rem;
+            }
+            .calendar-header label {
+                text-align: left;
+                display: block;
+            }
+            .calendar-header .calendar-nav {
+                justify-content: center !important;
+            }
+            .calendar-header .calendar-nav .btn {
+                flex: 1 1 30%;
+                min-width: 90px;
+            }
         }
     </style>
 </head>
@@ -144,9 +170,12 @@ $pageTitle = 'Calendario de Disponibilidad';
                 <!-- Controles del Calendario -->
                 <div class="calendar-header">
                     <div class="row align-items-center">
-                        <div class="col-md-4">
+                        <div class="col-md-4 calendar-control">
                             <label for="paquete_select" class="form-label">Seleccionar Paquete:</label>
                             <select class="form-select" id="paquete_select" onchange="cambiarPaquete()">
+                                <option value="0" <?php echo $idPaqueteSeleccionado === 0 ? 'selected' : ''; ?>>
+                                    Todos los paquetes
+                                </option>
                                 <?php foreach ($paquetes as $paquete): ?>
                                 <option value="<?php echo $paquete['id_paquete']; ?>"
                                         <?php echo $paquete['id_paquete'] == $idPaqueteSeleccionado ? 'selected' : ''; ?>>
@@ -156,14 +185,14 @@ $pageTitle = 'Calendario de Disponibilidad';
                             </select>
                         </div>
                         
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-4 text-center calendar-month">
                             <h3 class="mb-0">
                                 <?php echo $meses[$month] . ' ' . $year; ?>
                             </h3>
                         </div>
                         
-                        <div class="col-md-4 text-end">
-                            <div class="btn-group">
+                        <div class="col-md-4 text-end calendar-actions">
+                            <div class="calendar-nav d-flex flex-wrap gap-2 justify-content-md-end justify-content-center w-100" role="group" aria-label="Cambiar de mes">
                                 <a href="?id_paquete=<?php echo $idPaqueteSeleccionado; ?>&year=<?php echo $month == 1 ? $year - 1 : $year; ?>&month=<?php echo $month == 1 ? 12 : $month - 1; ?>" 
                                    class="btn btn-light">
                                     <i class="fas fa-chevron-left"></i> Anterior
@@ -305,12 +334,12 @@ $pageTitle = 'Calendario de Disponibilidad';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-    const idPaquete = <?php echo $idPaqueteSeleccionado; ?>;
-    
+    let idPaquete = <?php echo $idPaqueteSeleccionado; ?>;
+
     function cambiarPaquete() {
         const select = document.getElementById('paquete_select');
-        const idPaquete = select.value;
-        window.location.href = `?id_paquete=${idPaquete}&year=<?php echo $year; ?>&month=<?php echo $month; ?>`;
+        const nuevoPaquete = select.value;
+        window.location.href = `?id_paquete=${nuevoPaquete}&year=<?php echo $year; ?>&month=<?php echo $month; ?>`;
     }
     
     function verDia(fecha) {
@@ -352,47 +381,96 @@ $pageTitle = 'Calendario de Disponibilidad';
     
     function mostrarDetallesDia(data, fecha) {
         const modalBody = document.getElementById('modalDiaBody');
-        
+
         let html = '';
-        
-        // Mostrar si está desactivado
-        if (data.desactivado) {
-            html += `
-                <div class="alert alert-danger">
-                    <i class="fas fa-ban"></i> <strong>Este día está desactivado</strong><br>
-                    <small>Motivo: ${data.motivo_desactivacion || 'No especificado'}</small>
-                </div>
-                <button class="btn btn-success w-100 mb-3" onclick="reactivarDia(${data.id_disponibilidad})">
-                    <i class="fas fa-check"></i> Reactivar Día
-                </button>
-            `;
-        } else {
-            html += `
-                <div id="desactivarDiaWrapper">
-                    <button class="btn btn-danger w-100 mb-3" onclick="mostrarFormularioDesactivar()">
-                        <i class="fas fa-ban"></i> Desactivar Este Día
+
+        // Solo mostrar opciones de desactivar/reactivar si hay un paquete específico seleccionado
+        if (idPaquete > 0) {
+            // Mostrar si está desactivado
+            if (data.desactivado) {
+                html += `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-ban"></i> <strong>Este día está desactivado</strong><br>
+                        <small>Motivo: ${data.motivo_desactivacion || 'No especificado'}</small>
+                    </div>
+                    <button class="btn btn-success w-100 mb-3" onclick="reactivarDia(${data.id_disponibilidad})">
+                        <i class="fas fa-check"></i> Reactivar Día
                     </button>
-                    <div id="desactivarDiaForm" class="d-none">
+                `;
+            } else {
+                html += `
+                    <div id="desactivarDiaWrapper">
+                        <button class="btn btn-danger w-100 mb-3" onclick="mostrarFormularioDesactivar()">
+                            <i class="fas fa-ban"></i> Desactivar Este Día
+                        </button>
+                        <div id="desactivarDiaForm" class="d-none">
+                            <div class="mb-3">
+                                <label class="form-label">Motivo de desactivación</label>
+                                <textarea class="form-control" id="motivoDesactivarInput" rows="3" placeholder="Describe por qué se inhabilita este día"></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-danger" onclick="confirmarDesactivarDia('${fecha}')">
+                                    <i class="fas fa-check-circle"></i> Confirmar desactivación
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="cancelarDesactivarDia()" type="button">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        } else {
+            // Si está en modo "Todos los paquetes"
+
+            // Mostrar paquetes que tienen este día desactivado
+            if (data.paquetes_desactivados && data.paquetes_desactivados.length > 0) {
+                html += `
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Paquetes con día desactivado:</h6>
+                `;
+
+                data.paquetes_desactivados.forEach(paquete => {
+                    html += `
+                        <div class="mb-2 pb-2 border-bottom">
+                            <strong>${paquete.nombre_paquete}</strong>
+                            ${paquete.motivo ? `<br><small class="text-muted">Motivo: ${paquete.motivo}</small>` : ''}
+                            <br>
+                            <button class="btn btn-sm btn-success mt-1" onclick="reactivarDia(${paquete.id_disponibilidad})">
+                                <i class="fas fa-check"></i> Reactivar
+                            </button>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            }
+
+            // Opción para desactivar el día en todos los paquetes
+            html += `
+                <div id="desactivarTodosWrapper">
+                    <button class="btn btn-danger w-100 mb-3" onclick="mostrarFormularioDesactivarTodos()">
+                        <i class="fas fa-ban"></i> Desactivar Este Día en Todos los Paquetes
+                    </button>
+                    <div id="desactivarTodosForm" class="d-none">
                         <div class="mb-3">
                             <label class="form-label">Motivo de desactivación</label>
-                            <textarea class="form-control" id="motivoDesactivarInput" rows="3" placeholder="Describe por qué se inhabilita este día"></textarea>
+                            <textarea class="form-control" id="motivoDesactivarTodosInput" rows="3" placeholder="Describe por qué se inhabilita este día en todos los paquetes"></textarea>
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-danger" onclick="confirmarDesactivarDia('${fecha}')">
-                                <i class="fas fa-check-circle"></i> Confirmar desactivación
+                            <button class="btn btn-danger" onclick="confirmarDesactivarTodos('${fecha}')">
+                                <i class="fas fa-check-circle"></i> Confirmar desactivación en todos los paquetes
                             </button>
-                            <button class="btn btn-outline-secondary" onclick="cancelarDesactivarDia()" type="button">Cancelar</button>
+                            <button class="btn btn-outline-secondary" onclick="cancelarDesactivarTodos()" type="button">Cancelar</button>
                         </div>
                     </div>
                 </div>
             `;
         }
-        
+
         // Mostrar reservaciones
         if (data.reservaciones && data.reservaciones.length > 0) {
             html += '<h6 class="mt-3">Reservaciones:</h6>';
             html += '<div class="list-group">';
-            
+
             data.reservaciones.forEach(reserva => {
                 const badgeClass = {
                     'pendiente': 'warning',
@@ -401,40 +479,58 @@ $pageTitle = 'Calendario de Disponibilidad';
                     'cancelada': 'danger',
                     'completada': 'secondary'
                 }[reserva.estado] || 'secondary';
-                
+
+                // Si está en modo "Todos los paquetes", mostrar el nombre del paquete
+                const paqueteInfo = idPaquete === 0 ? `<br><small class="text-muted"><i class="fas fa-box"></i> ${reserva.nombre_paquete || 'Paquete'}</small>` : '';
+
                 html += `
                     <a href="reservaciones/detalle.php?id=${reserva.id_reservacion}" class="list-group-item list-group-item-action">
                         <div class="d-flex w-100 justify-content-between">
                             <h6 class="mb-1">${reserva.codigo_reservacion}</h6>
                             <small><span class="badge bg-${badgeClass}">${reserva.estado}</span></small>
                         </div>
-                        <p class="mb-1"><strong>${reserva.cliente_nombre}</strong></p>
+                        <p class="mb-1"><strong>${reserva.cliente_nombre}</strong>${paqueteInfo}</p>
                         <small>
-                            <i class="fas fa-clock"></i> ${reserva.hora_inicio} | 
-                            <i class="fas fa-users"></i> ${reserva.numero_personas} personas | 
+                            <i class="fas fa-clock"></i> ${reserva.hora_inicio} |
+                            <i class="fas fa-users"></i> ${reserva.numero_personas} personas |
                             $${parseFloat(reserva.monto_total).toFixed(2)}
                         </small>
                     </a>
                 `;
             });
-            
+
             html += '</div>';
         } else {
             html += '<p class="text-muted text-center mt-3">No hay reservaciones para este día</p>';
         }
-        
+
         modalBody.innerHTML = html;
     }
     
     function mostrarFormularioDesactivar() {
         document.getElementById('desactivarDiaForm')?.classList.remove('d-none');
     }
-    
+
     function cancelarDesactivarDia() {
         const form = document.getElementById('desactivarDiaForm');
         if (form) {
             form.classList.add('d-none');
             const textarea = document.getElementById('motivoDesactivarInput');
+            if (textarea) {
+                textarea.value = '';
+            }
+        }
+    }
+
+    function mostrarFormularioDesactivarTodos() {
+        document.getElementById('desactivarTodosForm')?.classList.remove('d-none');
+    }
+
+    function cancelarDesactivarTodos() {
+        const form = document.getElementById('desactivarTodosForm');
+        if (form) {
+            form.classList.add('d-none');
+            const textarea = document.getElementById('motivoDesactivarTodosInput');
             if (textarea) {
                 textarea.value = '';
             }
@@ -480,11 +576,60 @@ $pageTitle = 'Calendario de Disponibilidad';
         });
     }
     
+    function confirmarDesactivarTodos(fecha) {
+        const motivoInput = document.getElementById('motivoDesactivarTodosInput');
+        const motivo = motivoInput ? motivoInput.value.trim() : '';
+
+        if (!motivo) {
+            alert('Debe proporcionar un motivo');
+            return;
+        }
+
+        if (!confirm('¿Está seguro de desactivar este día en TODOS los paquetes?')) {
+            return;
+        }
+
+        fetch('<?php echo SITE_URL; ?>/api/admin/desactivar-fecha-todos.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                fecha: fecha,
+                motivo: motivo
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let mensaje = data.message;
+
+                // Mostrar detalles de paquetes con reservas si existen
+                if (data.detalles_reservas && data.detalles_reservas.length > 0) {
+                    mensaje += '\n\nPaquetes NO desactivados (tienen reservaciones):';
+                    data.detalles_reservas.forEach(paquete => {
+                        mensaje += `\n- ${paquete.nombre}: ${paquete.total_reservas} reserva(s)`;
+                    });
+                    mensaje += '\n\nDebe cancelar las reservaciones primero para desactivar estos paquetes.';
+                }
+
+                alert(mensaje);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al desactivar el día');
+        });
+    }
+
     function reactivarDia(idDisponibilidad) {
         if (!confirm('¿Está seguro de reactivar este día?')) {
             return;
         }
-        
+
         fetch('<?php echo SITE_URL; ?>/api/admin/reactivar-fecha.php', {
             method: 'POST',
             headers: {

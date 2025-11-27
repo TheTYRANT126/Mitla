@@ -165,8 +165,9 @@ class Calendario {
      * Obtener reservaciones de un día específico
      */
     public function obtenerReservasDia($fecha, $idPaquete = null) {
-        $sql = "SELECT r.*, 
-                       c.nombre_completo, 
+        $sql = "SELECT r.*,
+                       r.total AS monto_total,
+                       c.nombre_completo AS cliente_nombre,
                        c.email,
                        p.nombre_paquete,
                        COUNT(DISTINCT ag.id_guia) as guias_asignados
@@ -175,16 +176,16 @@ class Calendario {
                 INNER JOIN paquetes p ON r.id_paquete = p.id_paquete
                 LEFT JOIN asignacion_guias ag ON r.id_reservacion = ag.id_reservacion
                 WHERE r.fecha_tour = ?";
-        
+
         $params = [$fecha];
-        
+
         if ($idPaquete) {
             $sql .= " AND r.id_paquete = ?";
             $params[] = $idPaquete;
         }
-        
+
         $sql .= " GROUP BY r.id_reservacion ORDER BY r.hora_inicio";
-        
+
         return $this->db->fetchAll($sql, $params);
     }
     
